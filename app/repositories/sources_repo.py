@@ -36,7 +36,7 @@ def create_source(company_id: int, source_url: str, source_type: str,
 
 def update_source(source_id: int, **fields) -> None:
     allowed = {"source_url", "source_type", "ats_type", "crawl_frequency_minutes",
-               "active", "status", "reliability_score", "notes"}
+               "active", "status", "reliability_score", "reliability_override", "notes"}
     sets, params = [], []
     for k, v in fields.items():
         if k in allowed and v is not None:

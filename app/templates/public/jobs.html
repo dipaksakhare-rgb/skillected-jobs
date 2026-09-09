@@ -1,16 +1,16 @@
 {% extends "base.html" %}
 {% from "_macros.html" import job_card, pagination %}
-{% block title %}IT Jobs in Pune — Verified &amp; Direct Applications | Skillected Jobs{% endblock %}
+{% block title %}IT Jobs in Pune &amp; Maharashtra — Verified &amp; Direct Applications | Skillected Jobs{% endblock %}
 
 {% block content %}
 <div class="container page-head">
-  <h1>Verified IT Jobs</h1>
-  <p class="muted">{{ total }} job{{ 's' if total != 1 }} found — sorted by freshness, then relevance, then verification.</p>
+  <h1>Verified IT Jobs in Maharashtra</h1>
+  <p class="muted">{{ total }} job{{ 's' if total != 1 }} found across Pune, PCMC, Mumbai and Maharashtra — sorted by freshness, then verification.</p>
 
   <form class="filters-bar" method="get" action="/jobs">
     <input type="text" name="q" value="{{ filters.q }}" placeholder="Role, skill or company">
     <select name="city">
-      <option value="">All locations</option>
+      <option value="">All Maharashtra</option>
       {% for c in ['Pune','Pimpri-Chinchwad','Mumbai','Navi Mumbai','Thane','Nashik','Nagpur'] %}
       <option value="{{ c }}" {{ 'selected' if filters.city == c }}>{{ c }}</option>
       {% endfor %}

@@ -1,18 +1,18 @@
 {% extends "base.html" %}
 {% from "_macros.html" import job_card, stat_cards %}
-{% block title %}Skillected Jobs — Find Verified IT Jobs in Pune{% endblock %}
-{% block meta_description %}Fresh opportunities from company career pages — with direct application links. Verified IT jobs in Pune and Maharashtra.{% endblock %}
+{% block title %}Skillected Jobs — Fresher & IT Jobs in Pune and Maharashtra{% endblock %}
+{% block meta_description %}Verified fresher and entry-level IT jobs in Pune, PCMC, Mumbai and Maharashtra — direct from company career pages. Built for freshers starting their IT career.{% endblock %}
 
 {% block content %}
 <section class="hero">
   <div class="container">
     <span class="hero-badge">✓ Verified IT Opportunities. Direct Company Applications.</span>
-    <h1>Find Verified IT Jobs in Pune</h1>
-    <p class="sub">Fresh opportunities from company career pages — with direct application links.</p>
+    <h1>Start Your IT Career in Pune &amp; Maharashtra</h1>
+    <p class="sub">Verified fresher-friendly openings from company career pages — apply directly, no middlemen. Built for freshers, students and early-career professionals.</p>
     <form class="search-bar" action="/jobs" method="get" role="search">
       <input type="text" name="q" placeholder="Search job title, skill, company or technology" aria-label="Search jobs">
       <select name="city" aria-label="Location">
-        <option value="">All locations</option>
+        <option value="">All Maharashtra</option>
         <option value="Pune">Pune</option>
         <option value="Pimpri-Chinchwad">Pimpri-Chinchwad</option>
         <option value="Mumbai">Mumbai</option>
@@ -22,31 +22,19 @@
         <option value="Nagpur">Nagpur</option>
       </select>
       <select name="experience_max" aria-label="Experience">
+        <option value="0">🎓 Fresher (0 yr)</option>
         <option value="">Any experience</option>
-        <option value="0">Fresher (0 yr)</option>
         <option value="1">0–1 years</option>
         <option value="2">0–2 years</option>
         <option value="3">0–3 years</option>
       </select>
       <button class="btn btn-primary" type="submit">Search Jobs</button>
       <a class="btn btn-outline" href="/resume-match">Upload Resume</a>
-      <a class="btn btn-ghost" href="/jobs">Browse Latest Jobs</a>
+      <a class="btn btn-ghost" href="/jobs/freshers">All Fresher Jobs</a>
     </form>
 
     {{ stat_cards(stats) }}
   </div>
-</section>
-
-<section class="home-section container">
-  <div class="section-head">
-    <h2>🔥 Just Posted</h2>
-    <a class="more" href="/jobs?posted_within=24h">See all fresh jobs →</a>
-  </div>
-  {% if fresh_jobs %}
-    <div class="job-grid">{% for job in fresh_jobs %}{{ job_card(job) }}{% endfor %}</div>
-  {% else %}
-    <div class="empty">No jobs in the last 24 hours yet. <a href="/jobs">Browse all jobs</a>.</div>
-  {% endif %}
 </section>
 
 <section class="home-section container">
@@ -63,7 +51,19 @@
 
 <section class="home-section container">
   <div class="section-head">
-    <h2>📡 Pune IT Placement Radar</h2>
+    <h2>🔥 Just Posted</h2>
+    <a class="more" href="/jobs?posted_within=24h">See all fresh jobs →</a>
+  </div>
+  {% if fresh_jobs %}
+    <div class="job-grid">{% for job in fresh_jobs %}{{ job_card(job) }}{% endfor %}</div>
+  {% else %}
+    <div class="empty">No jobs in the last 24 hours yet. <a href="/jobs">Browse all jobs</a>.</div>
+  {% endif %}
+</section>
+
+<section class="home-section container">
+  <div class="section-head">
+    <h2>📡 Maharashtra IT Placement Radar</h2>
     <span class="muted small">Real data — updated from verified listings only</span>
   </div>
   <div class="table-wrap">
@@ -115,7 +115,7 @@
     <div class="collection-card"><span>✓ Verified company openings</span><span class="muted small">Every listing carries an authenticity score and a last-verified time.</span></div>
     <div class="collection-card"><span>🔗 Direct company applications</span><span class="muted small">Apply on the company's own website — no intermediary job boards.</span></div>
     <div class="collection-card"><span>🔥 Freshness you can trust</span><span class="muted small">"Posted" only when the company date is verified — otherwise "First seen".</span></div>
-    <div class="collection-card"><span>🎯 Built for Pune IT</span><span class="muted small">Pune, PCMC and Maharashtra hiring intelligence for students and professionals.</span></div>
+    <div class="collection-card"><span>🎯 Built for Maharashtra IT</span><span class="muted small">Pune, PCMC, Mumbai and Maharashtra hiring intelligence — fresher-first, for students and professionals.</span></div>
   </div>
 </section>
 {% endblock %}

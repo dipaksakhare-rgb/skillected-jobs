@@ -2,8 +2,10 @@
 from __future__ import annotations
 
 from app.core import database as db
+from app.services import geo
 
-_ACTIVE_PUBLISHED = ("job_status='active' AND verification_status='approved' AND is_demo=0")
+_ACTIVE_PUBLISHED = ("job_status='active' AND verification_status='approved' AND is_demo=0"
+                     " AND city IS NOT NULL")
 
 
 def platform_stats() -> dict:
@@ -25,6 +27,7 @@ def platform_stats() -> dict:
         "experienced_jobs": scalar(
             f"{base} AND experience_min>1"),
         "pune_jobs": scalar(f"{base} AND city='Pune'"),
+        "maharashtra_jobs": scalar(f"{base} AND state='Maharashtra'"),
         "companies_hiring": scalar(
             f"""SELECT COUNT(DISTINCT j.company_id) AS c FROM jobs j
                 WHERE {_ACTIVE_PUBLISHED}"""),
@@ -62,7 +65,8 @@ def placement_radar() -> dict:
 def skill_demand(limit: int = 15, domain_slug: str = "") -> list[dict]:
     """§27 — most requested skills from job_skills links (real rows only)."""
     params: list = []
-    where = "j.job_status='active' AND j.verification_status='approved' AND j.is_demo=0"
+    where = "j.job_status='active' AND j.verification_status='approved' AND j.is_demo=0" + \
+        f" AND {geo.SCOPE_SQL}"
     join = ""
     if domain_slug:
         join = "JOIN domains d ON d.domain_id = j.domain_id"

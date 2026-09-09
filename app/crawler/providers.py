@@ -17,30 +17,21 @@ from abc import ABC, abstractmethod
 from urllib.parse import urlparse
 
 from app.crawler.fetcher import Fetcher
-
-CITY_HINTS = ["Pune", "Pimpri-Chinchwad", "Hinjewadi", "Wakad", "Baner", "Kharadi",
-              "Viman Nagar", "Magarpatta", "Hadapsar", "Yerwada", "Kalyani Nagar",
-              "Koregaon Park", "Shivajinagar", "Aundh", "Balewadi", "Talegaon",
-              "Chakan", "Ranjangaon", "PCMC", "Mumbai", "Navi Mumbai", "Thane",
-              "Nashik", "Nagpur", "Chhatrapati Sambhajinagar", "Kolhapur", "Remote"]
-
-_PUNE_LOCALITIES = {"hinjewadi", "wakad", "baner", "kharadi", "viman nagar",
-                    "magarpatta", "hadapsar", "yerwada", "kalyani nagar",
-                    "koregaon park", "shivajinagar", "aundh", "balewadi",
-                    "talegaon", "chakan", "ranjangaon", "pcmc", "pimpri-chinchwad"}
+from app.services import geo
 
 
 def detect_city(location: str | None) -> str | None:
-    """Map a free-text location to our canonical city (§3); None if unknown."""
+    """Free-text location → canonical city, but ONLY for in-scope locations (§3).
+
+    Delegates to the central geo service: Maharashtra cities/localities map to
+    their city; India-Remote maps to "Remote"; everything else (other states,
+    other countries, bare 'Remote', unknown) returns None so the ingestion gate
+    can drop the job — the platform never shows out-of-scope listings.
+    """
     if not location:
         return None
-    low = location.lower()
-    for hint in CITY_HINTS:
-        if hint.lower() in low:
-            if hint.lower() in _PUNE_LOCALITIES:
-                return "Pune"
-            return hint
-    return None
+    result = geo.normalize_location(location)
+    return result[0] if result else None
 
 
 def _strip_html(raw: str | None) -> str:

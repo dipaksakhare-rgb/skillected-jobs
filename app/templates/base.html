@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>{% block title %}Skillected Jobs — Verified IT Jobs in Pune{% endblock %}</title>
-  <meta name="description" content="{% block meta_description %}Verified IT Opportunities. Direct Company Applications. Fresh IT jobs in Pune from company career pages.{% endblock %}">
+  <title>{% block title %}Skillected Jobs — Verified IT Jobs in Pune &amp; Maharashtra{% endblock %}</title>
+  <meta name="description" content="{% block meta_description %}Verified IT Opportunities. Direct Company Applications. Fresh IT jobs across Pune, Mumbai, Nashik, Nagpur and Maharashtra from company career pages.{% endblock %}">
   <link rel="canonical" href="{% block canonical %}{{ base_url }}{{ request.url.path }}{% endblock %}">
   <meta property="og:title" content="{% block og_title %}{{ self.title() }}{% endblock %}">
   <meta property="og:description" content="{{ self.meta_description() }}">
@@ -22,8 +22,8 @@
       <span class="brand-text">SKILLECTED <strong>JOBS</strong></span>
     </a>
     <nav class="main-nav" aria-label="Primary">
+      <a href="/jobs/freshers" class="{{ 'active' if active_nav == 'freshers' }}">🎓 Freshers</a>
       <a href="/jobs" class="{{ 'active' if active_nav == 'jobs' }}">Jobs</a>
-      <a href="/jobs/freshers" class="{{ 'active' if active_nav == 'freshers' }}">Freshers</a>
       <a href="/companies" class="{{ 'active' if active_nav == 'companies' }}">Companies</a>
       <a href="/domains" class="{{ 'active' if active_nav == 'domains' }}">Domains</a>
       <a href="/placement-radar">Placement Radar</a>
@@ -75,8 +75,8 @@
 </footer>
 
 <nav class="bottom-nav" aria-label="Mobile">
-  <a href="/jobs" class="{{ 'active' if active_nav == 'jobs' }}">🔎<span>Jobs</span></a>
   <a href="/jobs/freshers" class="{{ 'active' if active_nav == 'freshers' }}">🎓<span>Freshers</span></a>
+  <a href="/jobs" class="{{ 'active' if active_nav == 'jobs' }}">🔎<span>Jobs</span></a>
   <a href="/resume-match">📄<span>Resume</span></a>
   <a href="/companies" class="{{ 'active' if active_nav == 'companies' }}">🏢<span>Companies</span></a>
   <a href="/profile">👤<span>Profile</span></a>

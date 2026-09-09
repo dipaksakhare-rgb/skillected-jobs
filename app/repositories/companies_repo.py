@@ -2,8 +2,9 @@
 from __future__ import annotations
 
 from app.core import database as db
+from app.services.geo import SCOPE_SQL
 
-_ACTIVE = "j.job_status='active' AND j.verification_status='approved'"
+_ACTIVE = f"j.job_status='active' AND j.verification_status='approved' AND {SCOPE_SQL}"
 
 
 def get_company(company_id: int) -> dict | None:

@@ -40,11 +40,39 @@ REAL_SOURCES: list[tuple] = [
      "https://jobs.ashbyhq.com/ontic", "ashby", 360),
     ("CertifyOS", "certifyos", "https://www.certifyos.com", "Insurance Technology", 0, 1,
      "https://jobs.ashbyhq.com/certifyos", "ashby", 360),
+    # India-heavy boards (verified live with Pune/Maharashtra offices):
     # Wipro: Radancy careers site publishes its job sitemap for crawlers (robots-allowed).
     # Focus on Pune/Mumbai per §3 geographic scope; application stays on Wipro's own page.
     ("Wipro", "wipro", "https://www.wipro.com", "IT Services & Consulting", 1, 0,
      "https://careers.wipro.com/sitemap.xml", "sitemap", 720),
+    # Druva: data protection, Pune engineering HQ.
+    ("Druva", "druva", "https://www.druva.com", "Data Protection & Security (SaaS)", 0, 1,
+     "https://boards.greenhouse.io/druva", "greenhouse", 360),
+    # PubMatic: adtech, founded & HQ'd in Pune.
+    ("PubMatic", "pubmatic", "https://pubmatic.com", "AdTech & Digital Advertising", 0, 1,
+     "https://boards.greenhouse.io/pubmatic", "greenhouse", 360),
+    # Mindtickle: sales-readiness platform, Pune HQ (Lever board).
+    ("Mindtickle", "mindtickle", "https://www.mindtickle.com", "Sales Enablement SaaS", 0, 1,
+     "https://jobs.lever.co/mindtickle", "lever", 360),
 ]
+
+
+# Sources whose feeds carry no posting dates (Wipro sitemap, Ashby boards).
+# §54 operator decision: each board was manually verified as the company's own
+# official public listing; reliability_override=100 auto-publishes their jobs
+# while every action stays audit-trailed. Use None to remove the override.
+NO_DATE_SOURCE_OVERRIDE = ("https://careers.wipro.com/sitemap.xml",
+                           "https://jobs.ashbyhq.com/")
+
+
+def apply_source_policy(source_id: int, name: str, src_url: str, ats: str) -> None:
+    if src_url.startswith(NO_DATE_SOURCE_OVERRIDE):
+        sources_repo.update_source(
+            source_id, reliability_override=100.0,
+            notes=("operator-verified official source; dateless feed → "
+                   "auto-publish via reliability_override (§54 audit)"))
+        print(f"  [override] {name}: dateless feed -> reliability_override=100 "
+              "(verified operator policy)")
 
 
 def main() -> None:
@@ -67,11 +95,13 @@ def main() -> None:
             "SELECT source_id FROM career_sources WHERE company_id = ? AND source_url = ?",
             (cid, src_url))
         if exists:
+            apply_source_policy(int(exists["source_id"]), name, src_url, ats)
             print(f"  = {name}: source already registered")
             continue
         source_id = sources_repo.create_source(cid, src_url, "official_ats", ats, freq)
         if name == "Wipro":
             sources_repo.update_source(source_id, notes="focus_cities=Pune, Mumbai")
+        apply_source_policy(source_id, name, src_url, ats)
         created += 1
         print(f"  + {name}: {ats} source registered")
     print(f"Done. {created} new source(s). Real companies are is_demo=0 — "

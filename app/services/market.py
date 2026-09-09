@@ -6,13 +6,15 @@ a trend needs >= 8 jobs in the comparison window; skill lists need >= 5 jobs.
 from __future__ import annotations
 
 from app.core import database as db
+from app.services import geo
 
 MIN_JOBS_FOR_TREND = 8
 MIN_JOBS_FOR_SKILLS = 5
 
 
 def _active(where_extra: str = "", params: tuple = ()) -> tuple[str, tuple]:
-    where = "j.job_status='active' AND j.verification_status='approved' AND j.is_demo=0"
+    where = ("j.job_status='active' AND j.verification_status='approved' AND j.is_demo=0"
+             f" AND {geo.SCOPE_SQL}")
     if where_extra:
         where += f" AND {where_extra}"
     return where, params

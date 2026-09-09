@@ -19,7 +19,7 @@ from app.core import database as db
 from app.core.config import get_settings
 from app.core.security import verify_csrf
 from app.repositories import companies_repo, jobs_repo, stats_repo
-from app.services import content, freshness, scoring
+from app.services import content, freshness, geo, scoring
 from app.services.search import JobFilters, parse_filters
 
 settings = get_settings()
@@ -197,6 +197,7 @@ def domains_page(request: Request):
         """SELECT d.*, COUNT(j.job_id) AS active_jobs FROM domains d
            LEFT JOIN jobs j ON j.domain_id = d.domain_id
              AND j.job_status='active' AND j.verification_status='approved'
+             AND j.city IS NOT NULL
            GROUP BY d.domain_id ORDER BY d.sort_order""")
     return templates.TemplateResponse(request, "public/domains.html", _page_ctx(
         request, domains=[dict(r) for r in rows], active_nav="domains"))
@@ -286,7 +287,8 @@ def sitemap():
         urls.append(f"/jobs/pune/{topic}")
     rows = db.query_all(
         "SELECT job_id, slug FROM jobs WHERE job_status='active' "
-        "AND verification_status='approved' ORDER BY job_id DESC LIMIT 5000")
+        "AND verification_status='approved' AND city IS NOT NULL "
+        "ORDER BY job_id DESC LIMIT 5000")
     urls.extend(f"/jobs/{r['slug']}-{r['job_id']}" for r in rows)
     urls.extend(f"/companies/{r['slug']}" for r in db.query_all("SELECT slug FROM companies"))
     urls.extend(f"/domains/{r['slug']}" for r in db.query_all("SELECT slug FROM domains"))

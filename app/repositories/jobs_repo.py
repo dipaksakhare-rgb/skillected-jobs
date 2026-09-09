@@ -6,7 +6,7 @@ from collections.abc import Iterator
 from contextlib import contextmanager
 
 from app.core import database as db
-from app.services import freshness, search as search_svc, scoring
+from app.services import freshness, geo, search as search_svc, scoring
 from app.services.search import JobFilters
 
 _LIST_COLS = """j.job_id, j.company_id, j.company_name, j.company_logo_url, j.job_title,
@@ -82,6 +82,7 @@ def _where_clause(f: JobFilters, *, published_only: bool = True) -> tuple[str, l
     if published_only:
         where.append("j.job_status = 'active'")
         where.append("j.verification_status = 'approved'")
+        where.append(geo.SCOPE_SQL)          # §3 Maharashtra scope
     else:
         where.append("1=1")
     if f.q:
@@ -167,6 +168,7 @@ def get_job(job_id: int, published_only: bool = True) -> dict | None:
             LEFT JOIN domains d ON d.domain_id = j.domain_id
             LEFT JOIN companies c ON c.company_id = j.company_id
             WHERE j.job_id = ?""" + (" AND j.job_status='active' AND j.verification_status='approved'"
+                                     " AND " + geo.SCOPE_SQL
                                      if published_only else ""),
         (job_id,),
     )
@@ -183,7 +185,7 @@ def similar_jobs(job: dict, limit: int = 6) -> list[dict]:
     rows = db.query_all(
         f"""SELECT {_LIST_COLS} FROM jobs j LEFT JOIN domains d ON d.domain_id = j.domain_id
             WHERE j.job_status='active' AND j.verification_status='approved'
-              AND j.job_id != ? AND (j.domain_id = ? OR j.normalized_job_title LIKE ?)
+              AND {geo.SCOPE_SQL} AND j.job_id != ? AND (j.domain_id = ? OR j.normalized_job_title LIKE ?)
             ORDER BY COALESCE(j.published_at, j.first_seen_at) DESC LIMIT ?""",
         (job["job_id"], job.get("domain_id"), f"%{(job.get('normalized_job_title') or '')[:30]}%", limit),
     )

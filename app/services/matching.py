@@ -12,10 +12,14 @@ import json
 from app.core import database as db
 from app.services.search import expand_role
 
+# Fresher-first weighting (§32 adapted): the platform's audience is ~90% freshers,
+# so exact skill overlap and title similarity weigh a little less and experience
+# eligibility weighs a little more (fresher resumes must not be punished for
+# having no work history yet).
 WEIGHTS = {
-    "skills": 0.35,
-    "experience": 0.20,
-    "title": 0.15,
+    "skills": 0.33,
+    "experience": 0.24,
+    "title": 0.13,
     "education": 0.10,
     "location": 0.10,
     "tech_stack": 0.05,
@@ -88,8 +92,11 @@ def match_score(candidate: dict, job: dict) -> dict:
     j_min = job.get("experience_min")
     j_max = job.get("experience_max")
     if j_min is None and j_max is None:
-        exp_ratio, exp_ok = 0.6, True
-        reasons.append("✓ No strict experience requirement stated")
+        exp_ratio, exp_ok = (1.0 if c_exp <= 1 else 0.6), True
+        if c_exp <= 1:
+            reasons.append("✓ No experience requirement stated — open to freshers")
+        else:
+            reasons.append("✓ No strict experience requirement stated")
     else:
         lo = j_min if j_min is not None else 0.0
         hi = j_max if j_max is not None else lo + 2

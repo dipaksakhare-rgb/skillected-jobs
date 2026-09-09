@@ -4,7 +4,7 @@
 def test_home_page_renders(client):
     r = client.get("/")
     assert r.status_code == 200
-    assert "Find Verified IT Jobs in Pune" in r.text
+    assert "Start Your IT Career in Pune" in r.text
 
 
 def test_jobs_list_and_filters(client):

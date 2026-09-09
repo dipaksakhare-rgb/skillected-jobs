@@ -205,6 +205,9 @@ section.home-section { padding: 26px 0 6px; }
 }
 .verify-chip.review { color: var(--warn); background: var(--warn-soft); }
 .verify-chip.closed { color: var(--bad); background: var(--bad-soft); }
+.verify-chip.fresher-chip { color: #0a7d33; background: #e7f6ec; margin-left: 6px; }
+.stat-card.stat-fresher { border: 2px solid #0a7d33; background: #f2fbf5; }
+.stat-card.stat-fresher .num { color: #0a7d33; }
 
 .status-open { color: var(--ok); font-weight: 600; }
 .status-open-recent { color: var(--warn); font-weight: 600; }

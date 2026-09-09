@@ -38,7 +38,7 @@ def whatsapp_message(job: dict, apply_url: str) -> str:
         f"🔗 Apply Directly:\n{apply_url}\n\n"
         "📲 Scan the QR code on the poster to apply directly.\n\n"
         "⚠️ Apply only through the official company application link.\n\n"
-        "#SkillectedJobs #PuneJobs #ITJobs #FreshersJobs"
+        "#SkillectedJobs #MaharashtraJobs #PuneJobs #ITJobs #FresherJobs"
     )
 
 

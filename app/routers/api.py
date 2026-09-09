@@ -77,6 +77,7 @@ def api_domains():
         """SELECT d.*, COUNT(j.job_id) AS active_jobs FROM domains d
            LEFT JOIN jobs j ON j.domain_id = d.domain_id
              AND j.job_status='active' AND j.verification_status='approved'
+             AND j.city IS NOT NULL
            GROUP BY d.domain_id ORDER BY d.sort_order""")
     return {"items": [dict(r) for r in rows]}
 

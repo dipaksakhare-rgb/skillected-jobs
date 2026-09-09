@@ -19,7 +19,7 @@ def test_whatsapp_template_fields():
     assert "Java, Spring Boot" in msg
     assert "✓ Verified Company Opening" in msg
     assert "https://jobs.skillected.com/apply/1" in msg
-    assert "#SkillectedJobs #PuneJobs #ITJobs #FreshersJobs" in msg
+    assert "#SkillectedJobs #MaharashtraJobs #PuneJobs #ITJobs #FresherJobs" in msg
     assert "⚠️ Apply only through the official company application link." in msg
 
 

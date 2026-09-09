@@ -24,6 +24,7 @@
   {% endif %}
   <div class="card-foot">
     <span class="verify-chip {{ 'closed' if job.job_status in ('expired','closed') else '' }}">✓ Verified Company Opening</span>
+    {% if job.is_fresher_friendly %}<span class="verify-chip fresher-chip">🎓 Fresher OK</span>{% endif %}
     <span class="time">{{ job.time_label }}</span>
   </div>
   <div class="card-foot">
@@ -53,13 +54,14 @@
 
 {% macro stat_cards(stats) %}
 <div class="stats-row">
+  <div class="stat-card stat-fresher"><div class="num">{{ stats.fresher_jobs }}</div><div class="lbl">🎓 Fresher jobs</div></div>
   <div class="stat-card"><div class="num">{{ stats.jobs_discovered_today }}</div><div class="lbl">Jobs discovered today</div></div>
-  <div class="stat-card"><div class="num">{{ stats.jobs_last_12h }}</div><div class="lbl">Last 12 hours</div></div>
   <div class="stat-card"><div class="num">{{ stats.jobs_last_24h }}</div><div class="lbl">Last 24 hours</div></div>
-  <div class="stat-card"><div class="num">{{ stats.fresher_jobs }}</div><div class="lbl">Fresher jobs</div></div>
-  <div class="stat-card"><div class="num">{{ stats.experienced_jobs }}</div><div class="lbl">Experienced jobs</div></div>
   <div class="stat-card"><div class="num">{{ stats.pune_jobs }}</div><div class="lbl">Pune jobs</div></div>
+  <div class="stat-card"><div class="num">{{ stats.maharashtra_jobs }}</div><div class="lbl">Maharashtra jobs</div></div>
   <div class="stat-card"><div class="num">{{ stats.companies_hiring }}</div><div class="lbl">Companies hiring</div></div>
   <div class="stat-card"><div class="num">{{ stats.verified_openings }}</div><div class="lbl">Verified openings</div></div>
+  <div class="stat-card"><div class="num">{{ stats.experienced_jobs }}</div><div class="lbl">Experienced jobs</div></div>
+  <div class="stat-card"><div class="num">{{ stats.jobs_last_12h }}</div><div class="lbl">Last 12 hours</div></div>
 </div>
 {% endmacro %}

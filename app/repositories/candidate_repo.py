@@ -109,6 +109,7 @@ def run_alert_sweep() -> int:
             f"""SELECT j.job_id, j.company_name, j.job_title, j.city FROM jobs j
                 WHERE j.company_id IN ({marks}) AND j.job_status='active'
                   AND j.verification_status='approved' AND j.is_demo=0
+                  AND j.city IS NOT NULL
                   AND j.published_at >= datetime('now', '-24 hours')""",
             tuple(ids))
         for job in new_jobs:

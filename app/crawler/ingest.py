@@ -16,7 +16,7 @@ from app.core.config import get_settings
 from app.crawler.fetcher import Fetcher
 from app.crawler.providers import ProviderError, detect_city, resolve_provider
 from app.repositories import sources_repo
-from app.services import scoring
+from app.services import geo, scoring
 from app.services.taxonomy import normalize_list
 
 log = logging.getLogger("skillected.crawler")
@@ -54,8 +54,11 @@ DOMAIN_RULES: list[tuple[str, list[str]]] = [
                     "playwright", "cypress"]),
 ]
 
-FRESHER_TOKENS = ["fresher", "graduate", "trainee", "intern", "apprentice", "junior",
-                  "associate", "entry level", "get", "campus"]
+# Whole-word fresher signals (§30): 'get' means Graduate Engineer Trainee —
+# matched as a word so 'budget'/'target' in a title never flips the flag.
+FRESHER_TITLE_RE = re.compile(
+    r"\b(freshers?|graduates?|trainees?|interns?|internships?|apprentices?|"
+    r"apprenticeships?|junior|associate|entry[- ]level|get|campus)\b", re.I)
 
 
 def classify_domain(title: str, description: str = "") -> str | None:
@@ -98,8 +101,7 @@ def detect_work_mode(text: str) -> str | None:
 
 
 def is_fresher_friendly(title: str, exp_min: float | None) -> bool:
-    low = title.lower()
-    return any(t in low for t in FRESHER_TOKENS) or (exp_min is not None and exp_min <= 1)
+    return bool(FRESHER_TITLE_RE.search(title or "")) or (exp_min is not None and exp_min <= 1)
 
 
 # ---------------------------------------------------------------- pipeline
@@ -164,6 +166,16 @@ def _ingest_raw_job(raw: dict, source: dict, reliability: float,
         stats["duplicates"] += 1
         return stats
 
+    # §3 geographic scope — Maharashtra (Pune-first) only. detect_city is now
+    # scope-aware: it returns a canonical city ONLY for Maharashtra locations
+    # (or explicit India-Remote); other states, other countries, bare "Remote"
+    # and unknown locations yield None → dropped before scoring so they never
+    # enter review queues or the public site. Description text is deliberately
+    # NOT scanned (a Boston job mentioning a Pune office is still a Boston job).
+    if city is None:
+        stats["rejected"] += 1
+        return stats
+
     now_iso = scoring.now_utc_iso()
     posting_date = raw.get("posting_date")
     posting_verified = bool(raw.get("posting_date_verified"))
@@ -189,9 +201,16 @@ def _ingest_raw_job(raw: dict, source: dict, reliability: float,
                    ("payment_request", "credential_request", "personal_email",
                     "aggregator_application_url")}
 
+    # §54: operator-verified sources (reliability_override set — a human verified
+    # this official board personally) publish at the review threshold instead of
+    # the auto threshold: their dateless feeds can never reach 85 (no posting-date
+    # bonus), and requiring manual approval on every redeploy adds no safety.
+    # Fraud flags still force manual review regardless of the override.
+    effective_auto = (review_threshold if source.get("reliability_override") is not None
+                      else auto_threshold)
     if fraud_flags:
         decision = "manual_review"
-    elif score >= auto_threshold:
+    elif score >= effective_auto:
         decision = "auto_publish"
     elif score >= review_threshold:
         decision = "manual_review"
@@ -219,7 +238,7 @@ def _ingest_raw_job(raw: dict, source: dict, reliability: float,
             f"INSERT INTO jobs ({insert_cols}) VALUES ({placeholders})",
             (source["company_id"], company, title, normalized, slug,
              _domain_id(classify_domain(title, description)), raw.get("location"), city,
-             "Maharashtra" if city and city not in ("Remote",) else None, work_mode, None,
+             geo.MH_STATE if city != "Remote" else None, work_mode, None,
              exp_min, exp_max, None, None, description or None,
              source["source_type"], source["source_url"], url, raw.get("requisition_id"),
              posting_date, 1 if posting_verified else 0, now_iso, now_iso,

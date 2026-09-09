@@ -30,20 +30,32 @@ Then open http://127.0.0.1:8001 — homepage, /jobs, /jobs/freshers, /companies,
 
 ## Real job sources (Phase 2 live)
 
-12 companies publish verified openings via their own official channels — ATS boards
-and public careers sitemaps (no aggregators):
+15 companies publish verified openings via their own official channels — ATS boards
+and public careers sitemaps (no aggregators). **Geographic scope is Maharashtra-only
+(§3, Pune-first):** the ingestion gate archives jobs from other states/countries at
+crawl time, and `app/services/geo.py` + `scripts/backfill_geo_scope.py` enforce it
+everywhere (backfill is idempotent).
 
+- **Greenhouse (India-heavy):** Druva (Pune), PubMatic (Pune HQ)
 - **Greenhouse:** Speechify, Arkose Labs, DigiCert, Orion Innovation, ConnectWise, Securly, Addepar
-- **Lever:** Pattern
+- **Lever:** Pattern, Mindtickle (Pune HQ)
 - **Ashby:** OpenGov, Ontic, CertifyOS
-- **Careers sitemap (Radancy):** Wipro (854 Pune + 242 Mumbai; via
+- **Careers sitemap (Radancy):** Wipro (Pune + Mumbai focus; via
   `careers.wipro.com` sitemap — compliant public sitemap, no job pages scraped)
+
+Operator policy: dateless feeds (Wipro sitemap, Ashby boards) carry
+`reliability_override=100` (manually verified official sources, §54 audit) so their
+jobs auto-publish at the review threshold — no per-redeploy approval chore. Fraud
+flags still force manual review. Migration `004` adds the column.
 
 Note: TCS (login-gated portal), Infosys (robots.txt blocks everything), Cognizant
 (403s non-browser agents) and Capgemini (public feed has no India roles) are NOT
 ingestable compliantly under the §51 rules and were deliberately skipped.
 Guests can upload resumes without an account (results rendered in-memory, never
 stored); logged-in candidates keep stored resumes and profiles as before.
+The platform is fresher-first: homepage leads with fresher jobs, freshers are
+first in nav, cards carry a 'Fresher OK' chip, matching weights experience
+eligibility higher (§32 adapted).
 
 Manage: `python scripts/register_real_sources.py` (idempotent) ·
 crawl now: `python scripts/crawl_once.py [source_id ...]` · probe: `python scripts/probe_sources.py`.
@@ -59,5 +71,5 @@ runs are also triggerable from **/admin/crawler**.
 ## Tests
 
 ```bash
-python -m pytest        # 75 tests — services, crawlers, matching, resume AI, routers, auth
+python -m pytest        # 105 tests — services, crawlers, geo scope, matching, resume AI, routers, auth
 ```
