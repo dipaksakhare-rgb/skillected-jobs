@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% from "_macros.html" import job_card %}
+{% block title %}{{ title }} — Verified &amp; Direct Applications | Skillected Jobs{% endblock %}
+{% block meta_description %}{{ title }}: verified openings from official company career pages. Apply directly on company websites.{% endblock %}
+{% block content %}
+<div class="container page-head">
+  <h1>{{ title }}</h1>
+  <p class="muted">{{ total }} verified opening{{ 's' if total != 1 }}. Listings link straight to company application pages.</p>
+</div>
+<div class="container">
+  {% if jobs %}
+    <div class="job-grid">{% for job in jobs %}{{ job_card(job) }}{% endfor %}</div>
+  {% else %}
+    <div class="empty">No jobs in this category yet — <a href="/jobs">browse all jobs</a>.</div>
+  {% endif %}
+</div>
+{% endblock %}

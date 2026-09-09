@@ -1,0 +1,63 @@
+{% extends "admin/base.html" %}
+{% block title %}Sources — Skillected Admin{% endblock %}
+{% block admin_content %}
+<h1 style="margin-top:0">Career Sources</h1>
+<p class="muted">Crawl execution arrives in Phase 2; today you manage the registry, frequencies and health view.</p>
+
+<div class="panel" style="margin-bottom:16px">
+  <h2>Add source</h2>
+  <form class="filters-bar" method="post" action="/admin/sources">
+    <input type="hidden" name="_csrf" value="{{ session.csrf_token }}">
+    <select name="company_id" required>
+      <option value="">Select company</option>
+      {% for c in companies %}<option value="{{ c.company_id }}">{{ c.name }}</option>{% endfor %}
+    </select>
+    <input type="url" name="source_url" placeholder="https://careers.company.com/…" required style="min-width:280px">
+    <select name="source_type" required>
+      <option value="official_careers">Official careers (Tier 1)</option>
+      <option value="official_ats">Official ATS (Tier 2)</option>
+      <option value="permitted_public">Permitted public (Tier 3)</option>
+    </select>
+    <input type="text" name="ats_type" placeholder="ATS type (optional)">
+    <select name="crawl_frequency_minutes">
+      {% for f in [15,30,60,360,720,1440] %}<option value="{{ f }}" {{ 'selected' if f == 720 }}>Every {{ ('15 min','30 min','1 h','6 h','12 h','24 h')[loop.index0] }}</option>{% endfor %}
+    </select>
+    <button class="btn btn-primary btn-sm">Add source</button>
+  </form>
+</div>
+
+<div class="table-wrap">
+  <table>
+    <thead><tr><th>Company</th><th>Type</th><th>URL</th><th>Frequency</th><th>Health</th><th>Errors</th><th>Reliability</th><th>Actions</th></tr></thead>
+    <tbody>
+    {% for s in sources %}
+      <tr>
+        <td>{{ s.company_name }}</td>
+        <td>{{ s.source_type }}</td>
+        <td style="max-width:260px; overflow:hidden; text-overflow:ellipsis"><a href="{{ s.source_url }}" rel="noopener nofollow" target="_blank">{{ s.source_url }}</a></td>
+        <td>
+          <form class="inline-form" method="post" action="/admin/sources/{{ s.source_id }}/frequency">
+            <input type="hidden" name="_csrf" value="{{ session.csrf_token }}">
+            <select name="crawl_frequency_minutes" onchange="this.form.submit()">
+              {% for f in [15,30,60,360,720,1440] %}
+              <option value="{{ f }}" {{ 'selected' if s.crawl_frequency_minutes == f }}>{{ ('15 min','30 min','1 h','6 h','12 h','24 h')[loop.index0] }}</option>
+              {% endfor %}
+            </select>
+          </form>
+        </td>
+        <td><span class="{{ s.health_css }}">{{ s.health_label }}</span></td>
+        <td>{{ s.error_count }}</td>
+        <td>{{ s.reliability_score }}</td>
+        <td>
+          <form class="inline-form" method="post" action="/admin/sources/{{ s.source_id }}/toggle">
+            <input type="hidden" name="_csrf" value="{{ session.csrf_token }}">
+            <button class="btn btn-ghost btn-sm">{{ 'Disable' if s.active else 'Enable' }}</button>
+          </form>
+        </td>
+      </tr>
+    {% endfor %}
+    {% if not sources %}<tr><td colspan="8" class="muted">No sources registered yet.</td></tr>{% endif %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

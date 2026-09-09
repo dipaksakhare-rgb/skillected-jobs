@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% from "_macros.html" import job_card %}
+{% block title %}Fresher IT Jobs in Pune — Verified Openings | Skillected Jobs{% endblock %}
+{% block meta_description %}Fresher IT jobs in Pune: graduate, trainee, intern, apprentice and entry-level verified openings with direct company applications.{% endblock %}
+
+{% block content %}
+<div class="container page-head">
+  <h1>Fresher IT Jobs in Pune</h1>
+  <p class="muted">{{ total }} opening{{ 's' if total != 1 }} suitable for candidates with 0–1 year experience. Every job links to the company's own application page.</p>
+  <div class="chip-row" style="margin:10px 0 16px">
+    {% for kw in ['Fresher','Graduate','Trainee','Intern','Apprentice','Junior Developer','Associate Software Engineer','Graduate Engineer Trainee','Software Engineer I','Analyst','Support Engineer','QA Trainee'] %}
+      <span class="skill-chip">{{ kw }}</span>
+    {% endfor %}
+  </div>
+</div>
+<div class="container">
+  {% if jobs %}
+    <div class="job-grid">{% for job in jobs %}{{ job_card(job) }}{% endfor %}</div>
+  {% else %}
+    <div class="empty">No fresher jobs published yet — check back soon or <a href="/jobs">browse all jobs</a>.</div>
+  {% endif %}
+</div>
+{% endblock %}

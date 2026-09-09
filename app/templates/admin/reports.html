@@ -1,0 +1,31 @@
+{% extends "admin/base.html" %}
+{% block title %}Reports — Skillected Admin{% endblock %}
+{% block admin_content %}
+<h1 style="margin-top:0">Job Reports</h1>
+<div class="table-wrap">
+  <table>
+    <thead><tr><th>Job</th><th>Type</th><th>Message</th><th>Status</th><th>Received</th><th>Action</th></tr></thead>
+    <tbody>
+    {% for r in reports %}
+      <tr>
+        <td>{{ r.job_title }} <span class="muted small">({{ r.company_name }})</span></td>
+        <td>{{ r.report_type }}</td>
+        <td style="max-width:280px; white-space:normal">{{ r.message or '—' }}</td>
+        <td>{{ r.status }}</td>
+        <td class="muted small">{{ r.created_at }}</td>
+        <td>
+          {% if r.status == 'open' %}
+          <form class="inline-form" method="post" action="/admin/reports/{{ r.report_id }}/resolve">
+            <input type="hidden" name="_csrf" value="{{ session.csrf_token }}">
+            <input type="hidden" name="status_" value="resolved">
+            <button class="btn btn-outline btn-sm">Resolve</button>
+          </form>
+          {% else %}—{% endif %}
+        </td>
+      </tr>
+    {% endfor %}
+    {% if not reports %}<tr><td colspan="6" class="muted">No reports.</td></tr>{% endif %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

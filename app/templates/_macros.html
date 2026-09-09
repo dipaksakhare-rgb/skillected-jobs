@@ -1,0 +1,65 @@
+{% macro job_card(job, base_url='') %}
+<article class="job-card">
+  <span class="freshness-badge {{ job.freshness_css }}">{{ job.freshness_label }}</span>
+  <div class="card-top">
+    <div class="logo">
+      {% if job.company_logo_url %}<img src="{{ job.company_logo_url }}" alt="{{ job.company_name }} logo" loading="lazy">
+      {% else %}<span class="logo-fallback">{{ job.company_name[:1] }}</span>{% endif %}
+    </div>
+    <div class="company-line">
+      <div class="company-name">{{ job.company_name }}{% if job.is_demo %} <span class="demo-badge">DEMO DATA</span>{% endif %}</div>
+      <div class="job-title"><a href="/jobs/{{ job.slug }}-{{ job.job_id }}">{{ job.job_title }}</a></div>
+    </div>
+  </div>
+  <div class="job-meta">
+    <span>📍 {{ job.city or 'Not specified' }}{% if job.work_mode %} · {{ {'onsite':'On-site','hybrid':'Hybrid','remote':'Remote'}[job.work_mode] }}{% endif %}</span>
+    <span>👨‍💻 {{ job.experience_text }}</span>
+    {% if job.salary_display %}<span>💰 {{ job.salary_display }}</span>{% endif %}
+    {% if job.employment_type %}<span>🕑 {{ {'full_time':'Full-time','part_time':'Part-time','contract':'Contract','internship':'Internship'}[job.employment_type] }}</span>{% endif %}
+  </div>
+  {% if job.skills_list %}
+  <div class="job-skills">
+    {% for s in job.skills_list[:5] %}<span class="skill-chip">{{ s }}</span>{% endfor %}
+  </div>
+  {% endif %}
+  <div class="card-foot">
+    <span class="verify-chip {{ 'closed' if job.job_status in ('expired','closed') else '' }}">✓ Verified Company Opening</span>
+    <span class="time">{{ job.time_label }}</span>
+  </div>
+  <div class="card-foot">
+    <a class="btn btn-apply" href="/apply/{{ job.job_id }}" rel="nofollow">APPLY DIRECTLY</a>
+    <div class="card-actions">
+      <a class="btn btn-wa btn-sm" target="_blank" rel="noopener" href="/jobs/{{ job.job_id }}/whatsapp" title="Share to WhatsApp">📲 WhatsApp</a>
+      <a class="btn btn-outline btn-sm" href="/jobs/{{ job.slug }}-{{ job.job_id }}">Details</a>
+    </div>
+  </div>
+</article>
+{% endmacro %}
+
+{% macro pagination(page, pages, base_path, params='') %}
+{% if pages > 1 %}
+<nav class="pagination" aria-label="Pagination">
+  {% if page > 1 %}<a href="{{ base_path }}?page={{ page - 1 }}{{ params }}">← Prev</a>{% endif %}
+  {% for p in range(1, pages + 1) %}
+    {% if p <= 3 or p > pages - 2 or (p >= page - 1 and p <= page + 1) %}
+      {% if p == page %}<span class="current">{{ p }}</span>
+      {% else %}<a href="{{ base_path }}?page={{ p }}{{ params }}">{{ p }}</a>{% endif %}
+    {% endif %}
+  {% endfor %}
+  {% if page < pages %}<a href="{{ base_path }}?page={{ page + 1 }}{{ params }}">Next →</a>{% endif %}
+</nav>
+{% endif %}
+{% endmacro %}
+
+{% macro stat_cards(stats) %}
+<div class="stats-row">
+  <div class="stat-card"><div class="num">{{ stats.jobs_discovered_today }}</div><div class="lbl">Jobs discovered today</div></div>
+  <div class="stat-card"><div class="num">{{ stats.jobs_last_12h }}</div><div class="lbl">Last 12 hours</div></div>
+  <div class="stat-card"><div class="num">{{ stats.jobs_last_24h }}</div><div class="lbl">Last 24 hours</div></div>
+  <div class="stat-card"><div class="num">{{ stats.fresher_jobs }}</div><div class="lbl">Fresher jobs</div></div>
+  <div class="stat-card"><div class="num">{{ stats.experienced_jobs }}</div><div class="lbl">Experienced jobs</div></div>
+  <div class="stat-card"><div class="num">{{ stats.pune_jobs }}</div><div class="lbl">Pune jobs</div></div>
+  <div class="stat-card"><div class="num">{{ stats.companies_hiring }}</div><div class="lbl">Companies hiring</div></div>
+  <div class="stat-card"><div class="num">{{ stats.verified_openings }}</div><div class="lbl">Verified openings</div></div>
+</div>
+{% endmacro %}

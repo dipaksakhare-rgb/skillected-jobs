@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}IT Career Domains — Pune | Skillected Jobs{% endblock %}
+{% block content %}
+<div class="container page-head">
+  <h1>Career Domains</h1>
+  <p class="muted">Explore verified openings by career domain.</p>
+</div>
+<div class="container">
+  <div class="collection-grid">
+    {% for d in domains %}
+    <a class="collection-card domain-card" href="/domains/{{ d.slug }}">
+      <span>{{ d.icon }} {{ d.name }}</span>
+      <span class="muted small">{{ d.active_jobs }} active job{{ 's' if d.active_jobs != 1 }}</span>
+      <span class="muted small">{{ d.description[:110] }}{% if d.description | length > 110 %}…{% endif %}</span>
+    </a>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

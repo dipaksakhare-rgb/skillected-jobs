@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+{% from "_macros.html" import job_card %}
+{% block title %}Upload Resume &amp; Find My Best Jobs — Skillected Jobs{% endblock %}
+{% block meta_description %}Upload your resume to see which verified Pune IT jobs fit you best, your skill gaps and application readiness — matches stay private.{% endblock %}
+
+{% block content %}
+<div class="container page-head">
+  <h1>📄 Upload Resume &amp; Find My Best Jobs</h1>
+  <p class="muted">Your resume is private — it is never shown publicly and never sold (§65). Matches are computed on our platform.</p>
+</div>
+
+<div class="container" style="padding-bottom:24px">
+{% if mode == 'upload' %}
+  {% if error %}<div class="panel" style="border-left:4px solid var(--bad)"><p style="margin:0;color:var(--bad)">{{ error }}</p></div>{% endif %}
+  {% if guest %}
+  <div class="panel" style="border-left:4px solid var(--brand)">
+    <p style="margin:0"><strong>No account needed.</strong> Upload your resume and see your matches instantly — nothing is stored for guest uploads. <a href="/register?next=/resume-match">Create a free account</a> to save matches, track applications and re-run matches anytime.</p>
+  </div>
+  {% endif %}
+  <form class="panel" method="post" action="/resume-match" enctype="multipart/form-data">
+    <input type="hidden" name="_csrf" value="{{ csrf_token or (session.csrf_token if session else '') }}">
+    <div class="field">
+      <label for="resume">Resume file (PDF, DOCX or TXT — max 5 MB)</label>
+      <input type="file" id="resume" name="resume" accept=".pdf,.docx,.txt" required>
+    </div>
+    <div class="field">
+      <label style="font-weight:400">
+        <input type="checkbox" name="consent" value="1" required style="width:auto">
+        I consent to Skillected processing my resume to generate job matches. I can delete it any time from my profile.
+      </label>
+    </div>
+    <button class="btn btn-primary" type="submit">Upload &amp; Find Matches</button>
+  </form>
+
+{% else %}
+  <div class="detail-grid">
+    <div style="display:flex;flex-direction:column;gap:16px">
+      <div class="panel">
+        <h2>Resume Health Score</h2>
+        <div style="display:flex;align-items:baseline;gap:10px">
+          <span style="font-size:40px;font-weight:800">{{ '%.0f'|format(resume.health_score or 0) }}</span>
+          <span class="muted">/ 100</span>
+        </div>
+        {% if good %}<ul>{% for g in good %}<li class="status-open">{{ g }}</li>{% endfor %}</ul>{% endif %}
+        {% if needs %}<ul style="margin-bottom:0">{% for n in needs %}<li style="color:var(--warn)">{{ n }}</li>{% endfor %}</ul>{% endif %}
+        <p class="muted small" style="margin-bottom:0">File: {{ resume.file_name }} · uploaded {{ resume.uploaded_at }}</p>
+      </div>
+
+      <div class="panel">
+        <h2>Recommended jobs</h2>
+        {% if matches %}
+          {% for job in matches %}
+            {{ job_card(job) }}
+            <div class="panel" style="margin:-6px 0 14px; padding:14px 16px">
+              <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+                <strong>{{ job.match.band }} — {{ job.match.score }}%</strong>
+                {% if job.match.is_stretch %}<span class="demo-badge">🟡 Stretch opportunity — Apply Anyway</span>{% endif %}
+                <span style="margin-left:auto" class="muted small">Application readiness: {{ job.match.readiness.percent }}%</span>
+              </div>
+              {% if job.match.reasons %}<ul style="margin:8px 0 4px">{% for r in job.match.reasons %}<li class="status-open small">{{ r }}</li>{% endfor %}</ul>{% endif %}
+              {% if job.match.gaps %}<ul style="margin:0"><li class="small" style="color:var(--warn)">Skill gaps: {{ job.match.gaps|join(' · ') }}</li></ul>{% endif %}
+              {% if job.match.readiness.checks %}
+              <ul class="small" style="margin:6px 0 0;color:var(--muted)">
+                {% for c in job.match.readiness.checks %}<li>{{ '✓' if c.ok else '△' }} {{ c.label }}</li>{% endfor %}
+              </ul>
+              {% endif %}
+            </div>
+          {% endfor %}
+        {% else %}
+          <p class="muted">No strong matches yet — add more skills to your profile or check <a href="/jobs">all jobs</a>.</p>
+        {% endif %}
+      </div>
+    </div>
+
+    <aside style="display:flex;flex-direction:column;gap:16px">
+      <div class="panel">
+        <h2>Your skill gap</h2>
+        {% if gap.market_needs %}
+          <p><strong>You are {{ gap.gap_count }} skill{{ 's' if gap.gap_count != 1 }} away from stronger matches.</strong></p>
+          <p class="muted small">You have: {{ gap.you_have|join(', ') or '—' }}</p>
+          <div class="job-skills">
+            {% for m in gap.market_needs %}<span class="skill-chip" style="background:var(--warn-soft);color:var(--warn)">{{ m.skill }} ({{ m.demand }})</span>{% endfor %}
+          </div>
+        {% else %}
+          <p class="muted">Skill-gap analysis appears once verified jobs list their skills.</p>
+        {% endif %}
+      </div>
+
+      <div class="panel">
+        <h2>Suggested Skillected learning</h2>
+        {% if courses %}
+          <ul style="margin:0;padding-left:18px">
+            {% for c in courses %}
+            <li style="margin-bottom:10px">
+              <a href="{{ c.official_url or 'https://www.skillected.com/' }}" target="_blank" rel="noopener"><strong>{{ c.title }}</strong></a>
+              <div class="muted small">Covers: {{ c.covers }}</div>
+              <div class="muted small">{{ c.description }}</div>
+            </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <p class="muted">Course suggestions appear once skill gaps are detected. See the <a href="/curriculum-intelligence">curriculum intelligence page</a>.</p>
+        {% endif %}
+        <p class="muted small" style="margin-bottom:0">Current programs and fees: <a href="https://www.skillected.com/" target="_blank" rel="noopener">skillected.com</a></p>
+      </div>
+    </aside>
+  </div>
+{% endif %}
+</div>
+{% endblock %}

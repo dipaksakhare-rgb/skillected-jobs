@@ -1,0 +1,164 @@
+{% extends "base.html" %}
+{% from "_macros.html" import job_card %}
+{% block title %}My Profile — Skillected Jobs{% endblock %}
+{% block content %}
+<div class="container page-head">
+  <h1>👤 My Profile</h1>
+  {% if notifications %}
+  <div class="panel" style="border-left:4px solid var(--brand); margin:12px 0 0">
+    <h2 style="margin-top:0">🔔 Notifications</h2>
+    <ul style="margin:0 0 8px">{% for n in notifications %}
+      <li><a href="{{ n.link or '#' }}"><strong>{{ n.title }}</strong></a> <span class="muted small">{{ n.body }}</span></li>
+    {% endfor %}</ul>
+    <form method="post" action="/notifications/read">
+      <input type="hidden" name="_csrf" value="{{ session.csrf_token }}">
+      <button class="btn btn-ghost btn-sm">Mark all read</button>
+    </form>
+  </div>
+  {% endif %}
+</div>
+
+<div class="container detail-grid" style="padding-bottom:24px">
+  <div style="display:flex;flex-direction:column;gap:16px">
+
+    <div class="panel">
+      <h2>My details</h2>
+      <p class="muted small">{{ session.email }}</p>
+      <form method="post" action="/profile">
+        <input type="hidden" name="_csrf" value="{{ session.csrf_token }}">
+        <div class="field"><label>Headline (e.g. React Developer, Fresher)</label>
+          <input type="text" name="headline" value="{{ profile.headline or '' }}" maxlength="120"></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <div class="field"><label>Years of experience</label>
+            <input type="number" step="0.5" min="0" max="40" name="experience_years" value="{{ profile.experience_years if profile and profile.experience_years is not none else 0 }}"></div>
+          <div class="field"><label>Preferred work mode</label>
+            <select name="work_mode_pref">
+              <option value="" {{ 'selected' if not profile or not profile.work_mode_pref }}>Any</option>
+              <option value="onsite" {{ 'selected' if profile and profile.work_mode_pref == 'onsite' }}>On-site</option>
+              <option value="hybrid" {{ 'selected' if profile and profile.work_mode_pref == 'hybrid' }}>Hybrid</option>
+              <option value="remote" {{ 'selected' if profile and profile.work_mode_pref == 'remote' }}>Remote</option>
+            </select></div>
+        </div>
+        <div class="field"><label>Skills (comma separated)</label>
+          <input type="text" name="skills" value="{{ profile.skills or '' }}" placeholder="Python, SQL, Power BI"></div>
+        <div class="field"><label>Preferred roles (comma separated)</label>
+          <input type="text" name="preferred_roles" value="{{ profile.preferred_roles or '' }}" placeholder="Data Analyst, BI Analyst"></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <div class="field"><label>Preferred locations</label>
+            <input type="text" name="preferred_locations" value="{{ profile.preferred_locations or '' }}" placeholder="Pune, Remote"></div>
+          <div class="field"><label>Preferred domains</label>
+            <input type="text" name="preferred_domains" value="{{ profile.preferred_domains or '' }}" placeholder="data-analytics, full-stack"></div>
+        </div>
+        <button class="btn btn-primary" type="submit">Save profile</button>
+      </form>
+    </div>
+
+    <div class="panel">
+      <h2>📄 Resume &amp; matches</h2>
+      <p class="muted">Upload your resume to get personalized job matches, a resume health score and skill-gap analysis.</p>
+      <a class="btn btn-primary" href="/resume-match">Open Resume Match</a>
+    </div>
+
+    <div class="panel">
+      <h2>🎯 Application tracking</h2>
+      {% if applications %}
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Role</th><th>Company</th><th>Applied</th><th>Status</th><th>Update</th></tr></thead>
+          <tbody>
+          {% for a in applications %}
+            <tr>
+              <td>{% if a.slug %}<a href="/jobs/{{ a.slug }}-{{ a.job_id }}">{{ a.role_title or a.job_title }}</a>{% else %}{{ a.role_title or a.job_title or '—' }}{% endif %}</td>
+              <td>{{ a.company_name }}</td>
+              <td class="muted small">{{ a.applied_on or a.created_at[:10] }}</td>
+              <td><strong>{{ a.status }}</strong></td>
+              <td>
+                <form class="inline-form" method="post" action="/applications/{{ a.application_id }}/status">
+                  <input type="hidden" name="_csrf" value="{{ session.csrf_token }}">
+                  <select name="status" style="width:auto;padding:6px">
+                    {% for s in ('applied','assessment','interview_1','interview_2','hr','selected','offer','joined','rejected','withdrawn') %}
+                    <option value="{{ s }}" {{ 'selected' if a.status == s }}>{{ s.replace('_',' ') }}</option>
+                    {% endfor %}
+                  </select>
+                  <button class="btn btn-outline btn-sm">Update</button>
+                </form>
+              </td>
+            </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <p class="muted">No applications tracked yet. After you apply on a company site, click “I applied” on the job page to start tracking.</p>
+      {% endif %}
+    </div>
+
+    <div class="panel">
+      <h2>⭐ Saved jobs</h2>
+      {% if saved_jobs %}
+      <div class="job-grid">{% for job in saved_jobs %}{{ job_card(job) }}{% endfor %}</div>
+      {% else %}<p class="muted">No saved jobs yet — use Save on any job card.</p>{% endif %}
+    </div>
+  </div>
+
+  <aside style="display:flex;flex-direction:column;gap:16px">
+    <div class="panel">
+      <h2>🔔 Job alerts</h2>
+      {% if alerts %}
+      <ul style="margin:0 0 10px;padding-left:18px">
+        {% for a in alerts %}
+        <li class="small" style="margin-bottom:6px">
+          <strong>{{ a.alert_type }}</strong>: {{ a.alert_value }}
+          <span class="muted">every {{ a.frequency_minutes }} min</span>
+          <form class="inline-form" method="post" action="/alerts/{{ a.alert_id }}/deactivate">
+            <input type="hidden" name="_csrf" value="{{ session.csrf_token }}">
+            <button class="btn btn-ghost btn-sm">Turn off</button>
+          </form>
+        </li>
+        {% endfor %}
+      </ul>
+      {% else %}<p class="muted small">No active alerts.</p>{% endif %}
+      <form method="post" action="/alerts">
+        <input type="hidden" name="_csrf" value="{{ session.csrf_token }}">
+        <div class="field"><label>Type</label>
+          <select name="alert_type">
+            <option value="role">Role</option><option value="skill">Skill</option>
+            <option value="domain">Domain</option><option value="company">Company</option>
+            <option value="location">Location</option>
+          </select></div>
+        <div class="field"><label>Value</label>
+          <input type="text" name="alert_value" placeholder="e.g. Python" required maxlength="120"></div>
+        <div class="field"><label>Frequency</label>
+          <select name="frequency_minutes">
+            <option value="60">Hourly</option><option value="360">Every 6 hours</option>
+            <option value="720" selected>Every 12 hours</option><option value="1440">Daily</option><option value="10080">Weekly</option>
+          </select></div>
+        <button class="btn btn-outline btn-sm">Create alert</button>
+      </form>
+    </div>
+
+    <div class="panel">
+      <h2>🏢 Companies I follow</h2>
+      {% if followed_companies %}
+      <ul style="margin:0;padding-left:18px">
+        {% for c in followed_companies %}<li><a href="/companies/{{ c.slug }}">{{ c.name }}</a></li>{% endfor %}
+      </ul>
+      {% else %}<p class="muted small">Follow companies from their profile pages to get new-job alerts.</p>{% endif %}
+    </div>
+
+    <div class="panel">
+      <h2>🧭 Placement pipeline</h2>
+      <p class="muted small">Where are you in your journey? (updates your placement timeline)</p>
+      <form method="post" action="/profile/pipeline" id="pipeline-form">
+        <input type="hidden" name="_csrf" value="{{ session.csrf_token }}">
+        <div class="field"><select name="stage">
+          {% for s in ('training','resume_ready','eligible_jobs','recommended_jobs','applied','assessment','interview_1','interview_2','hr','selected','joined') %}
+          <option value="{{ s }}">{{ s.replace('_',' ') }}</option>
+          {% endfor %}
+        </select></div>
+        <button class="btn btn-outline btn-sm">Update stage</button>
+      </form>
+    </div>
+  </aside>
+</div>
+{% endblock %}

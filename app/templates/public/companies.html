@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}IT Companies Hiring in Pune | Skillected Jobs{% endblock %}
+{% block content %}
+<div class="container page-head">
+  <h1>Companies Hiring</h1>
+  <form class="filters-bar" method="get" action="/companies">
+    <input type="text" name="q" value="{{ q }}" placeholder="Search companies">
+    <button class="btn btn-primary btn-sm" type="submit">Search</button>
+  </form>
+</div>
+<div class="container">
+  <div class="collection-grid">
+    {% for c in companies %}
+    <a class="collection-card" href="/companies/{{ c.slug }}">
+      <span>{{ c.name }}{% if c.is_demo %} <span class="demo-badge">DEMO</span>{% endif %}</span>
+      <span class="muted small">{{ c.active_jobs }} active job{{ 's' if c.active_jobs != 1 }}{% if c.industry %} · {{ c.industry }}{% endif %}</span>
+    </a>
+    {% endfor %}
+    {% if not companies %}<div class="empty">No companies found.</div>{% endif %}
+  </div>
+</div>
+{% endblock %}

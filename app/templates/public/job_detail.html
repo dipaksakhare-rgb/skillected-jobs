@@ -1,0 +1,152 @@
+{% extends "base.html" %}
+{% from "_macros.html" import job_card %}
+{% block title %}{{ job.job_title }} at {{ job.company_name }} — {{ job.city }} | Skillected Jobs{% endblock %}
+{% block meta_description %}{{ job.job_title }} opening at {{ job.company_name }} ({{ job.city }}). Verified company opening — apply directly on the company website.{% endblock %}
+
+{% block head_extra %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "JobPosting",
+  "title": "{{ job.job_title }}",
+  "hiringOrganization": { "@type": "Organization", "name": "{{ job.company_name }}" },
+  "jobLocation": {
+    "@type": "Place",
+    "address": { "@type": "PostalAddress", "addressLocality": "{{ job.city }}", "addressRegion": "{{ job.state }}", "addressCountry": "{{ job.country }}" }
+  },
+  "employmentType": "{{ job.employment_type or 'FULL_TIME' }}",
+  "datePosted": "{{ (job.posting_date or job.first_seen_at or '')[:10] }}",
+  "validThrough": "{{ (job.deadline or '')[:10] if job.deadline else '' }}",
+  "directApply": true,
+  "applicationContact": { "@type": "ContactPoint", "url": "{{ apply_url }}" }
+}
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="container detail-grid">
+  <div style="display:flex; flex-direction:column; gap:16px;">
+    <div class="panel">
+      <div class="card-top">
+        <div class="logo">
+          {% if job.company_logo_url %}<img src="{{ job.company_logo_url }}" alt="{{ job.company_name }}">
+          {% else %}<span class="logo-fallback">{{ job.company_name[:1] }}</span>{% endif %}
+        </div>
+        <div>
+          <div class="company-name">{{ job.company_name }}{% if job.is_demo %} <span class="demo-badge">DEMO DATA</span>{% endif %}</div>
+          <div class="job-title" style="font-size:22px">{{ job.job_title }}</div>
+          <span class="freshness-badge {{ job.freshness_css }}" style="position:static; display:inline-block; margin-top:6px">{{ job.freshness_label }}</span>
+        </div>
+      </div>
+
+      <hr style="border:none; border-top:1px solid var(--line); margin:16px 0">
+      <dl class="kv">
+        <dt>Location</dt><dd>📍 {{ job.location or job.city or 'Not specified' }}{% if job.work_mode %} · {{ {'onsite':'On-site','hybrid':'Hybrid','remote':'Remote'}[job.work_mode] }}{% endif %}</dd>
+        <dt>Experience</dt><dd>👨‍💻 {{ job.experience_text }}</dd>
+        <dt>Salary</dt><dd>{{ job.salary_display or 'Not specified' }}</dd>
+        <dt>Employment</dt><dd>{{ {'full_time':'Full-time','part_time':'Part-time','contract':'Contract','internship':'Internship'}.get(job.employment_type, 'Not specified') }}</dd>
+        <dt>Domain</dt><dd>{% if job.domain_name %}<a href="/domains/{{ job.domain_slug }}">{{ job.domain_icon }} {{ job.domain_name }}</a>{% else %}Not specified{% endif %}</dd>
+        <dt>Educational qualifications</dt><dd>{{ job.education or 'Not specified' }}</dd>
+        {% if job.skills_list %}<dt>Skills</dt><dd><span class="job-skills">{% for s in job.skills_list %}<span class="skill-chip">{{ s }}</span>{% endfor %}</span></dd>{% endif %}
+        {% if job.technologies_list %}<dt>Technologies</dt><dd>{{ job.technologies_list | join(', ') }}</dd>{% endif %}
+        {% if job.job_requisition_id %}<dt>Requisition ID</dt><dd>{{ job.job_requisition_id }}</dd>{% endif %}
+        <dt>Posted</dt><dd>{{ job.time_label }}{% if job.time_basis == 'first_seen' %} <span class="muted small">(company posting date not verified)</span>{% endif %}</dd>
+        <dt>First seen</dt><dd>{{ job.first_seen_at }}</dd>
+        <dt>Last verified</dt><dd>{{ job.last_verified_at or 'Not yet verified' }}</dd>
+      </dl>
+    </div>
+
+    {% if job.job_description %}
+    <div class="panel">
+      <h2>Job description</h2>
+      <p style="white-space:pre-line">{{ job.job_description }}</p>
+    </div>
+    {% endif %}
+
+    {% if job.requirements_list %}
+    <div class="panel">
+      <h2>Requirements</h2>
+      <ul>{% for r in job.requirements_list %}<li>{{ r }}</li>{% endfor %}</ul>
+    </div>
+    {% endif %}
+
+    <div class="panel trust-box">
+      <h2>Verification information</h2>
+      <p class="{{ 'status-closed' if job.job_status in ('expired','closed') else 'status-open' }}">{{ verified_band }}</p>
+      <dl class="kv">
+        <dt>Source</dt><dd>{{ {'official_careers':'Official company careers website (Tier 1)','official_ats':'Official company ATS (Tier 2)','permitted_public':'Permitted public source (Tier 3)'}.get(job.source_type, 'Not specified') }}</dd>
+        <dt>Authenticity score</dt><dd><strong>{{ job.authenticity_score or '—' }}/100</strong> — {{ 'Highly Trusted' if (job.authenticity_score or 0) >= 90 else 'Verified' if (job.authenticity_score or 0) >= 75 else 'Needs Review' }}</dd>
+        <dt>Application</dt><dd>Direct link to the company's official application page</dd>
+        <dt>Company website</dt><dd>{{ job.company_official_url or 'Not specified' }}</dd>
+      </dl>
+      <p class="muted small">⚠️ Apply only through the official company application link. Never pay any fee for a job application.</p>
+    </div>
+  </div>
+
+  <aside class="apply-box">
+    <div class="panel">
+      {% if job.job_status in ('expired','closed') %}
+        <span class="verify-chip closed">🔴 Application closed</span>
+        <p class="muted small">This listing is no longer accepting applications.</p>
+      {% else %}
+        <a class="btn btn-apply btn-block" href="/apply/{{ job.job_id }}" rel="nofollow">APPLY DIRECTLY ON COMPANY WEBSITE</a>
+        <p class="muted small">You will be redirected to the verified application page on the company's official website.</p>
+      {% endif %}
+      <div class="share-row">
+        <a class="btn btn-apply btn-sm" target="_blank" rel="noopener" href="{{ wa_url }}">📲 Share on WhatsApp</a>
+        <a class="btn btn-outline btn-sm" href="/jobs/{{ job.job_id }}/whatsapp">📋 Copy message</a>
+        <a class="btn btn-outline btn-sm" href="/jobs/{{ job.job_id }}/poster">🖼 Poster</a>
+        <a class="btn btn-outline btn-sm" href="/jobs/{{ job.job_id }}/qr?format=png" download="skillected-job-{{ job.job_id }}-qr.png">⬇ QR Code</a>
+        <a class="btn btn-ghost btn-sm" href="/jobs/{{ job.job_id }}/report">⚠ Report job</a>
+      </div>
+      {% if session %}
+      <form method="post" action="/jobs/{{ job.job_id }}/save">
+        <input type="hidden" name="_csrf" value="{{ session.csrf_token }}">
+        <button class="btn btn-ghost btn-sm" style="margin-top:8px">⭐ Save this job</button>
+      </form>
+      {% else %}
+      <a class="btn btn-ghost btn-sm" href="/login?next=/jobs/{{ job.job_id }}" style="margin-top:8px">⭐ Sign in to save this job</a>
+      {% endif %}
+    </div>
+
+    <div class="panel">
+      <h2>Did you apply?</h2>
+      {% if session %}
+      <p class="muted small">Track your application so Skillected placement support can help you (§44). Company application status is never assumed.</p>
+      <form method="post" action="/apply/{{ job.job_id }}/track">
+        <input type="hidden" name="_csrf" value="{{ session.csrf_token }}">
+        <div class="chip-row">
+          <button class="btn btn-outline btn-sm" name="did_apply" value="yes">✓ Yes, I applied</button>
+        </div>
+      </form>
+      {% else %}
+      <p class="muted small"><a href="/login">Sign in</a> to track your applications and get placement support.</p>
+      {% endif %}
+    </div>
+
+    <div class="panel">
+      <h2>Scan to apply</h2>
+      <img src="/jobs/{{ job.job_id }}/qr?format=svg" alt="QR code — scan to apply directly" style="width:100%; max-width:220px" loading="lazy">
+      <p class="muted small">The QR opens the direct application link.</p>
+    </div>
+
+    <div class="panel">
+      <h2>About {{ job.company_name }}</h2>
+      <p class="muted">
+        {% if job.is_mnc %}Multinational company. {% endif %}{% if job.is_startup %}Startup. {% endif %}
+        <a href="/companies/{{ job.company_id }}">View company profile and all openings →</a>
+      </p>
+      <a class="btn btn-ghost btn-sm" href="/jobs?company={{ job.company_name | urlencode }}">Find similar jobs</a>
+    </div>
+  </aside>
+</div>
+
+<section class="home-section container">
+  <div class="section-head"><h2>Find similar jobs</h2></div>
+  {% if similar %}
+    <div class="job-grid">{% for j in similar %}{{ job_card(j) }}{% endfor %}</div>
+  {% else %}
+    <div class="empty">No similar jobs right now.</div>
+  {% endif %}
+</section>
+{% endblock %}

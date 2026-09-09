@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Admin Login — Skillected Jobs</title>
+  <link rel="stylesheet" href="/static/css/main.css">
+</head>
+<body>
+<main class="site-main" style="display:grid;place-items:center;padding:40px 16px">
+  <form class="panel" style="width:100%;max-width:400px" method="post" action="/admin/login">
+    <h1 style="margin-top:0">Placement Dashboard</h1>
+    <p class="muted small">Skillected Jobs internal admin. Login attempts are rate-limited and audited.</p>
+    {% if request.query_params.get('error') %}
+      <p style="color:var(--bad);font-weight:600">Invalid email or password.</p>
+    {% endif %}
+    <div class="field">
+      <label for="email">Email</label>
+      <input id="email" type="email" name="email" required autocomplete="username">
+    </div>
+    <div class="field">
+      <label for="password">Password</label>
+      <input id="password" type="password" name="password" required autocomplete="current-password">
+    </div>
+    <button class="btn btn-primary btn-block" type="submit">Sign in</button>
+  </form>
+</main>
+</body>
+</html>

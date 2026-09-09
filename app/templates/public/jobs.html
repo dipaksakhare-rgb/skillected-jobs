@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% from "_macros.html" import job_card, pagination %}
+{% block title %}IT Jobs in Pune — Verified &amp; Direct Applications | Skillected Jobs{% endblock %}
+
+{% block content %}
+<div class="container page-head">
+  <h1>Verified IT Jobs</h1>
+  <p class="muted">{{ total }} job{{ 's' if total != 1 }} found — sorted by freshness, then relevance, then verification.</p>
+
+  <form class="filters-bar" method="get" action="/jobs">
+    <input type="text" name="q" value="{{ filters.q }}" placeholder="Role, skill or company">
+    <select name="city">
+      <option value="">All locations</option>
+      {% for c in ['Pune','Pimpri-Chinchwad','Mumbai','Navi Mumbai','Thane','Nashik','Nagpur'] %}
+      <option value="{{ c }}" {{ 'selected' if filters.city == c }}>{{ c }}</option>
+      {% endfor %}
+    </select>
+    <select name="domain">
+      <option value="">All domains</option>
+      {% for slug, label in [('full-stack','Full Stack'),('data-science-ai-ml','Data Science & AI/ML'),('data-analytics','Data Analytics'),('business-analysis','Business Analysis'),('devops-cloud','DevOps & Cloud'),('cybersecurity','Cybersecurity'),('embedded-iot','Embedded & IoT'),('qa-testing','QA & Testing'),('other-it','Other IT')] %}
+      <option value="{{ slug }}" {{ 'selected' if filters.domain == slug }}>{{ label }}</option>
+      {% endfor %}
+    </select>
+    <select name="experience_max">
+      <option value="">Experience</option>
+      <option value="0" {{ 'selected' if filters.experience_max == 0 }}>Fresher</option>
+      <option value="1" {{ 'selected' if filters.experience_max == 1 }}>0–1 yr</option>
+      <option value="3" {{ 'selected' if filters.experience_max == 3 }}>0–3 yr</option>
+      <option value="5" {{ 'selected' if filters.experience_max == 5 }}>0–5 yr</option>
+    </select>
+    <select name="posted_within">
+      <option value="">Any time</option>
+      {% for key, mins in posted_filters %}
+      <option value="{{ key }}" {{ 'selected' if filters.posted_within == key }}>Last {{ key }}</option>
+      {% endfor %}
+    </select>
+    <select name="work_mode">
+      <option value="">Work mode</option>
+      <option value="onsite" {{ 'selected' if filters.work_mode == 'onsite' }}>On-site</option>
+      <option value="hybrid" {{ 'selected' if filters.work_mode == 'hybrid' }}>Hybrid</option>
+      <option value="remote" {{ 'selected' if filters.work_mode == 'remote' }}>Remote</option>
+    </select>
+    <label class="small" style="align-self:center"><input type="checkbox" name="fresher" value="1" {{ 'checked' if filters.fresher }}> Fresher</label>
+    <label class="small" style="align-self:center"><input type="checkbox" name="verified_only" value="1" {{ 'checked' if filters.verified_only }}> Highly trusted</label>
+    <button class="btn btn-primary btn-sm" type="submit">Apply filters</button>
+    <a class="btn btn-ghost btn-sm" href="/jobs">Reset</a>
+  </form>
+</div>
+
+<div class="container">
+  {% if jobs %}
+    <div class="job-grid">{% for job in jobs %}{{ job_card(job) }}{% endfor %}</div>
+    {{ pagination(page, pages, '/jobs') }}
+  {% else %}
+    <div class="empty">
+      <p><strong>No jobs match these filters yet.</strong></p>
+      <p>Try widening the time window or <a href="/jobs">resetting filters</a>.</p>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

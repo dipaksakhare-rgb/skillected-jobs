@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Share via WhatsApp — {{ job.job_title }} | Skillected Jobs{% endblock %}
+{% block content %}
+<div class="container page-head">
+  <h1>📲 WhatsApp-ready message</h1>
+  <p class="muted">{{ job.job_title }} at {{ job.company_name }}{% if job.is_demo %} <span class="demo-badge">DEMO DATA</span>{% endif %}</p>
+</div>
+<div class="container detail-grid">
+  <div class="panel">
+    <h2>Message preview</h2>
+    <pre style="white-space:pre-wrap; background:#f0fdf4; border:1px solid #bbf7d0; border-radius:12px; padding:16px; font-family:inherit">{{ wa_text }}</pre>
+    <div class="share-row">
+      <button class="btn btn-outline" data-copy="{{ wa_text }}">📋 Copy WhatsApp Message</button>
+      <a class="btn btn-apply" target="_blank" rel="noopener" href="{{ wa_url }}">Share on WhatsApp</a>
+      <a class="btn btn-outline" href="/jobs/{{ job.job_id }}/poster">🖼 Generate Poster</a>
+      <a class="btn btn-ghost" href="/jobs/{{ job.slug }}-{{ job.job_id }}">← Back to job</a>
+    </div>
+  </div>
+  <aside class="panel">
+    <h2>Poster QR</h2>
+    <img src="/jobs/{{ job.job_id }}/qr?format=svg" alt="Job QR code" style="width:100%;max-width:200px">
+    <p class="muted small">QR links to the direct application tracking URL: {{ apply_url }}</p>
+    <a class="btn btn-outline btn-sm" href="/jobs/{{ job.job_id }}/qr?format=png" download>⬇ Download QR (PNG)</a>
+  </aside>
+</div>
+{% endblock %}

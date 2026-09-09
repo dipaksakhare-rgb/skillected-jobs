@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Skillected Jobs — Verified IT Jobs in Pune{% endblock %}</title>
+  <meta name="description" content="{% block meta_description %}Verified IT Opportunities. Direct Company Applications. Fresh IT jobs in Pune from company career pages.{% endblock %}">
+  <link rel="canonical" href="{% block canonical %}{{ base_url }}{{ request.url.path }}{% endblock %}">
+  <meta property="og:title" content="{% block og_title %}{{ self.title() }}{% endblock %}">
+  <meta property="og:description" content="{{ self.meta_description() }}">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Skillected Jobs">
+  <link rel="stylesheet" href="/static/css/main.css">
+  <link rel="icon" href="/static/logo.svg" type="image/svg+xml">
+  {% block head_extra %}{% endblock %}
+</head>
+<body>
+<header class="site-header">
+  <div class="container header-inner">
+    <a href="/" class="brand" aria-label="Skillected Jobs home">
+      <span class="brand-mark">S</span>
+      <span class="brand-text">SKILLECTED <strong>JOBS</strong></span>
+    </a>
+    <nav class="main-nav" aria-label="Primary">
+      <a href="/jobs" class="{{ 'active' if active_nav == 'jobs' }}">Jobs</a>
+      <a href="/jobs/freshers" class="{{ 'active' if active_nav == 'freshers' }}">Freshers</a>
+      <a href="/companies" class="{{ 'active' if active_nav == 'companies' }}">Companies</a>
+      <a href="/domains" class="{{ 'active' if active_nav == 'domains' }}">Domains</a>
+      <a href="/placement-radar">Placement Radar</a>
+      <a href="/career-insights">Career Insights</a>
+      <a href="/resume-match">Resume Match</a>
+    </nav>
+    <div class="header-actions">
+      {% if session %}
+        <a href="/admin" class="btn btn-ghost btn-sm">{{ session.email }}</a>
+        <a href="/admin/logout" class="btn btn-ghost btn-sm">Logout</a>
+      {% else %}
+        <a href="/admin/login" class="btn btn-ghost btn-sm">Sign in</a>
+      {% endif %}
+    </div>
+  </div>
+</header>
+
+<main class="site-main">
+  {% block content %}{% endblock %}
+</main>
+
+<footer class="site-footer">
+  <div class="container footer-grid">
+    <div>
+      <div class="brand"><span class="brand-mark">S</span> SKILLECTED <strong>JOBS</strong></div>
+      <p class="muted">Verified IT Opportunities.<br>Direct Company Applications.</p>
+    </div>
+    <div>
+      <h4>Explore</h4>
+      <a href="/jobs">All Jobs</a>
+      <a href="/jobs/freshers">Fresher Jobs</a>
+      <a href="/collections/todays-best-fresher-jobs">Today's Fresher Jobs</a>
+      <a href="/domains">Career Domains</a>
+    </div>
+    <div>
+      <h4>Trust &amp; Safety</h4>
+      <a href="/disclaimer">Disclaimer</a>
+      <a href="/privacy">Privacy Policy</a>
+      <a href="/terms">Terms</a>
+    </div>
+    <div>
+      <h4>For Employers</h4>
+      <p class="muted">Jobs are sourced from official company career pages. To correct or remove a listing, <a href="https://www.skillected.com/">contact Skillected</a>.</p>
+    </div>
+  </div>
+  <div class="container footer-legal">
+    <p>Skillected Jobs aggregates and organizes publicly available employment information from company career sources and other permitted sources. Skillected does not guarantee hiring outcomes. Candidates should verify job details and application information on the company's official website before applying.</p>
+  </div>
+</footer>
+
+<nav class="bottom-nav" aria-label="Mobile">
+  <a href="/jobs" class="{{ 'active' if active_nav == 'jobs' }}">🔎<span>Jobs</span></a>
+  <a href="/jobs/freshers" class="{{ 'active' if active_nav == 'freshers' }}">🎓<span>Freshers</span></a>
+  <a href="/resume-match">📄<span>Resume</span></a>
+  <a href="/companies" class="{{ 'active' if active_nav == 'companies' }}">🏢<span>Companies</span></a>
+  <a href="/profile">👤<span>Profile</span></a>
+</nav>
+
+<script src="/static/js/main.js" defer></script>
+</body>
+</html>

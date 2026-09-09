@@ -1,0 +1,32 @@
+# Render.com blueprint — one-click deploy for Skillected Jobs.
+# Deploy: push to GitHub → Render Dashboard → New → Blueprint → select repo.
+services:
+  - type: web
+    name: skillected-jobs
+    runtime: python
+    plan: starter          # free tier works too (see docs/09-DEPLOYMENT.md)
+    buildCommand: pip install -r requirements.txt
+    startCommand: python scripts/start_prod.py
+    healthCheckPath: /healthz
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: APP_BASE_URL
+        sync: false        # set to your https://<app>.onrender.com after first deploy
+      - key: APP_SECRET
+        generateValue: true
+      - key: ADMIN_EMAIL
+        sync: false
+      - key: ADMIN_PASSWORD
+        sync: false
+      - key: AUTO_REGISTER_SOURCES
+        value: "1"
+      - key: INITIAL_CRAWL
+        value: "1"
+      # Persistent disk keeps the SQLite DB + stored resumes across deploys.
+      - key: DATABASE_URL
+        value: sqlite:////var/data/skillected.db
+    disk:
+      name: skillected-data
+      mountPath: /var/data
+      sizeGB: 1

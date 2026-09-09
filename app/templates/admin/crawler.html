@@ -1,0 +1,58 @@
+{% extends "admin/base.html" %}
+{% block title %}Crawler — Skillected Admin{% endblock %}
+{% block admin_content %}
+<h1 style="margin-top:0">Crawler &amp; Ingestion</h1>
+<p class="muted">Pipeline: fetch → parse → normalize → classify → dedupe → verify → score → publish (§52). Demo-company sources are never crawled.</p>
+
+<div class="panel" style="margin-bottom:16px">
+  <h2>Run controls</h2>
+  <div class="chip-row">
+    <form class="inline-form" method="post" action="/admin/crawler/run">
+      <input type="hidden" name="_csrf" value="{{ session.csrf_token }}">
+      <button class="btn btn-primary btn-sm">▶ Run crawl now</button>
+    </form>
+    <form class="inline-form" method="post" action="/admin/expiry/run">
+      <input type="hidden" name="_csrf" value="{{ session.csrf_token }}">
+      <button class="btn btn-outline btn-sm">⏱ Run expiry check</button>
+    </form>
+  </div>
+  <p class="muted small" style="margin-bottom:0">The scheduler also runs due sources automatically in the background (cadence per source, §89).</p>
+</div>
+
+{% if last %}
+<div class="panel" style="margin-bottom:16px">
+  <h2>Latest crawl report (§53)</h2>
+  <div class="metric-grid">
+    <div class="stat-card"><div class="num">{{ last.sources_checked or 0 }}</div><div class="lbl">Sources checked</div></div>
+    <div class="stat-card"><div class="num">{{ last.jobs_discovered or 0 }}</div><div class="lbl">Jobs discovered</div></div>
+    <div class="stat-card"><div class="num">{{ last.verified or 0 }}</div><div class="lbl">Published</div></div>
+    <div class="stat-card"><div class="num">{{ last.fresher_jobs or 0 }}</div><div class="lbl">Fresher</div></div>
+    <div class="stat-card"><div class="num">{{ last.pune_jobs or 0 }}</div><div class="lbl">Pune</div></div>
+    <div class="stat-card"><div class="num">{{ last.duplicates or 0 }}</div><div class="lbl">Duplicates</div></div>
+    <div class="stat-card"><div class="num">{{ last.rejected or 0 }}</div><div class="lbl">Rejected</div></div>
+    <div class="stat-card"><div class="num">{{ last.errors or 0 }}</div><div class="lbl">Errors</div></div>
+  </div>
+  <p class="muted small">Run #{{ last.run_id }} · {{ last.started_at }} → {{ last.finished_at or 'running' }} · status {{ last.status }}</p>
+</div>
+{% endif %}
+
+<div class="panel">
+  <h2>Run history</h2>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Run</th><th>Trigger</th><th>Started</th><th>Sources</th><th>Discovered</th><th>Published</th><th>Duplicates</th><th>Rejected</th><th>Errors</th><th>Status</th></tr></thead>
+      <tbody>
+      {% for r in history %}
+        <tr>
+          <td>#{{ r.run_id }}</td><td>{{ r.trigger }}</td><td class="muted small">{{ r.started_at }}</td>
+          <td>{{ r.sources_checked }}</td><td>{{ r.jobs_discovered }}</td><td>{{ r.verified }}</td>
+          <td>{{ r.duplicates }}</td><td>{{ r.rejected }}</td><td>{{ r.errors }}</td>
+          <td>{{ r.status }}</td>
+        </tr>
+      {% endfor %}
+      {% if not history %}<tr><td colspan="10" class="muted">No crawls yet — run one now.</td></tr>{% endif %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

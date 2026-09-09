@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% from "_macros.html" import job_card %}
+{% block title %}{{ domain.name }} Jobs in Pune | Skillected Jobs{% endblock %}
+{% block meta_description %}{{ domain.name }} jobs in Pune — verified openings with direct company applications, top requested skills and fresher roles.{% endblock %}
+
+{% block content %}
+<div class="container page-head">
+  <h1>{{ domain.icon }} {{ domain.name }} Jobs in Pune</h1>
+  <p class="muted">{{ total }} verified opening{{ 's' if total != 1 }} in this domain.</p>
+</div>
+
+<div class="container detail-grid">
+  <div style="display:flex;flex-direction:column;gap:16px">
+    <div class="panel">
+      <h2>Latest {{ domain.name }} jobs</h2>
+      {% if jobs %}
+        <div class="job-grid">{% for j in jobs %}{{ job_card(j) }}{% endfor %}</div>
+      {% else %}
+        <div class="empty">No jobs in this domain yet.</div>
+      {% endif %}
+    </div>
+    {% if fresher_jobs %}
+    <div class="panel">
+      <h2>Fresher opportunities ({{ fresher_total }})</h2>
+      <div class="job-grid">{% for j in fresher_jobs %}{{ job_card(j) }}{% endfor %}</div>
+    </div>
+    {% endif %}
+  </div>
+
+  <aside style="display:flex;flex-direction:column;gap:16px">
+    <div class="panel">
+      <h2>Most requested skills</h2>
+      {% if top_skills %}
+        <div class="job-skills">
+          {% for s in top_skills %}<span class="skill-chip">{{ s.canonical }} · {{ s.demand }}</span>{% endfor %}
+        </div>
+      {% else %}
+        <p class="muted">Not enough data yet — skill demand appears once verified jobs are indexed.</p>
+      {% endif %}
+    </div>
+    <div class="panel">
+      <h2>Hiring trend</h2>
+      <p class="muted small">Trend analysis becomes available once the platform has sufficient verified historical data. No trend is shown until then (§70: no conclusions from insufficient sample sizes).</p>
+    </div>
+    <div class="panel">
+      <h2>Skillected learning</h2>
+      <p class="muted small">Skill-gap based course recommendations arrive with the AI matching phase. Current course information comes from <a href="https://www.skillected.com/">skillected.com</a>.</p>
+    </div>
+  </aside>
+</div>
+{% endblock %}

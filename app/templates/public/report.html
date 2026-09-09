@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Report job | Skillected Jobs{% endblock %}
+{% block content %}
+<div class="container page-head">
+  <h1>⚠ Report a job</h1>
+  <p class="muted">{{ job.job_title }} at {{ job.company_name }}</p>
+</div>
+<div class="container">
+  <form class="panel" style="max-width:560px" method="post" action="/jobs/{{ job.job_id }}/report">
+    <input type="hidden" name="_csrf" value="{{ token }}">
+    <div class="field">
+      <label for="report_type">What's wrong?</label>
+      <select id="report_type" name="report_type" required>
+        <option value="incorrect">Incorrect job details</option>
+        <option value="expired">Job is expired / closed</option>
+        <option value="suspicious">Suspicious or fraudulent</option>
+        <option value="wrong_company">Wrong company</option>
+        <option value="broken_link">Broken application link</option>
+        <option value="other">Other</option>
+      </select>
+    </div>
+    <div class="field">
+      <label for="message">Details (optional)</label>
+      <textarea id="message" name="message" rows="4" maxlength="2000" placeholder="Tell us what you noticed"></textarea>
+    </div>
+    <button class="btn btn-primary" type="submit">Submit report</button>
+    <a class="btn btn-ghost" href="/jobs/{{ job.slug }}-{{ job.job_id }}">Cancel</a>
+  </form>
+</div>
+{% endblock %}

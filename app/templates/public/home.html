@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+{% from "_macros.html" import job_card, stat_cards %}
+{% block title %}Skillected Jobs — Find Verified IT Jobs in Pune{% endblock %}
+{% block meta_description %}Fresh opportunities from company career pages — with direct application links. Verified IT jobs in Pune and Maharashtra.{% endblock %}
+
+{% block content %}
+<section class="hero">
+  <div class="container">
+    <span class="hero-badge">✓ Verified IT Opportunities. Direct Company Applications.</span>
+    <h1>Find Verified IT Jobs in Pune</h1>
+    <p class="sub">Fresh opportunities from company career pages — with direct application links.</p>
+    <form class="search-bar" action="/jobs" method="get" role="search">
+      <input type="text" name="q" placeholder="Search job title, skill, company or technology" aria-label="Search jobs">
+      <select name="city" aria-label="Location">
+        <option value="">All locations</option>
+        <option value="Pune">Pune</option>
+        <option value="Pimpri-Chinchwad">Pimpri-Chinchwad</option>
+        <option value="Mumbai">Mumbai</option>
+        <option value="Navi Mumbai">Navi Mumbai</option>
+        <option value="Thane">Thane</option>
+        <option value="Nashik">Nashik</option>
+        <option value="Nagpur">Nagpur</option>
+      </select>
+      <select name="experience_max" aria-label="Experience">
+        <option value="">Any experience</option>
+        <option value="0">Fresher (0 yr)</option>
+        <option value="1">0–1 years</option>
+        <option value="2">0–2 years</option>
+        <option value="3">0–3 years</option>
+      </select>
+      <button class="btn btn-primary" type="submit">Search Jobs</button>
+      <a class="btn btn-outline" href="/resume-match">Upload Resume</a>
+      <a class="btn btn-ghost" href="/jobs">Browse Latest Jobs</a>
+    </form>
+
+    {{ stat_cards(stats) }}
+  </div>
+</section>
+
+<section class="home-section container">
+  <div class="section-head">
+    <h2>🔥 Just Posted</h2>
+    <a class="more" href="/jobs?posted_within=24h">See all fresh jobs →</a>
+  </div>
+  {% if fresh_jobs %}
+    <div class="job-grid">{% for job in fresh_jobs %}{{ job_card(job) }}{% endfor %}</div>
+  {% else %}
+    <div class="empty">No jobs in the last 24 hours yet. <a href="/jobs">Browse all jobs</a>.</div>
+  {% endif %}
+</section>
+
+<section class="home-section container">
+  <div class="section-head">
+    <h2>🎓 Best Fresher Jobs</h2>
+    <a class="more" href="/jobs/freshers">All fresher jobs →</a>
+  </div>
+  {% if fresher_jobs %}
+    <div class="job-grid">{% for job in fresher_jobs %}{{ job_card(job) }}{% endfor %}</div>
+  {% else %}
+    <div class="empty">No fresher jobs published yet.</div>
+  {% endif %}
+</section>
+
+<section class="home-section container">
+  <div class="section-head">
+    <h2>📡 Pune IT Placement Radar</h2>
+    <span class="muted small">Real data — updated from verified listings only</span>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Domain</th><th>New jobs (24h)</th><th>Fresher</th><th>Experienced</th><th>Total</th></tr></thead>
+      <tbody>
+        {% for row in radar.by_domain %}
+        <tr>
+          <td><a href="/domains/{{ row.slug }}">{{ row.icon }} {{ row.name }}</a></td>
+          <td>{{ row.new_jobs or 0 }}</td>
+          <td>{{ row.fresher or 0 }}</td>
+          <td>{{ row.experienced or 0 }}</td>
+          <td class="radar-total">{{ row.total }}</td>
+        </tr>
+        {% endfor %}
+        {% if not radar.by_domain %}<tr><td colspan="5" class="muted">No verified jobs yet.</td></tr>{% endif %}
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="home-section container">
+  <div class="section-head">
+    <h2>🏢 Companies Hiring</h2>
+    <a class="more" href="/companies">All companies →</a>
+  </div>
+  <div class="collection-grid">
+    {% for c in companies %}
+      <a class="collection-card" href="/companies/{{ c.slug }}">
+        <span>{{ c.name }}</span>
+        <span class="muted small">{{ c.active_jobs }} active job{{ 's' if c.active_jobs != 1 }}{% if c.industry %} · {{ c.industry }}{% endif %}</span>
+      </a>
+    {% endfor %}
+  </div>
+</section>
+
+<section class="home-section container">
+  <div class="section-head"><h2>📄 Resume Match</h2></div>
+  <div class="panel">
+    <h3>Upload your resume — find your best matches</h3>
+    <p class="muted">Upload your resume to see which verified jobs fit you best, understand your skill gaps and get an application readiness score.</p>
+    <a class="btn btn-primary" href="/resume-match">Upload Resume</a>
+  </div>
+</section>
+
+<section class="home-section container">
+  <div class="section-head"><h2>Why Skillected Jobs</h2></div>
+  <div class="collection-grid">
+    <div class="collection-card"><span>✓ Verified company openings</span><span class="muted small">Every listing carries an authenticity score and a last-verified time.</span></div>
+    <div class="collection-card"><span>🔗 Direct company applications</span><span class="muted small">Apply on the company's own website — no intermediary job boards.</span></div>
+    <div class="collection-card"><span>🔥 Freshness you can trust</span><span class="muted small">"Posted" only when the company date is verified — otherwise "First seen".</span></div>
+    <div class="collection-card"><span>🎯 Built for Pune IT</span><span class="muted small">Pune, PCMC and Maharashtra hiring intelligence for students and professionals.</span></div>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}📡 Pune IT Placement Radar — Skillected Jobs{% endblock %}
+{% block meta_description %}Live Pune IT Placement Radar: verified job counts by domain, fresher vs experienced, computed only from real platform data.{% endblock %}
+{% block content %}
+<div class="container page-head">
+  <h1>📡 Pune IT Placement Radar</h1>
+  <p class="muted">Real aggregated platform data — verified, published jobs only (demo data excluded). Generated {{ radar.generated_at }} UTC.</p>
+</div>
+<div class="container" style="padding-bottom:24px">
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Domain</th><th>New jobs (24h)</th><th>Fresher</th><th>Experienced</th><th>Total</th></tr></thead>
+      <tbody>
+        {% for row in radar.by_domain %}
+        <tr>
+          <td><a href="/domains/{{ row.slug }}">{{ row.icon }} {{ row.name }}</a></td>
+          <td>{{ row.new_jobs or 0 }}</td><td>{{ row.fresher or 0 }}</td><td>{{ row.experienced or 0 }}</td>
+          <td class="radar-total">{{ row.total }}</td>
+        </tr>
+        {% endfor %}
+        {% if not radar.by_domain %}<tr><td colspan="5" class="muted">No verified jobs yet.</td></tr>{% endif %}
+      </tbody>
+    </table>
+  </div>
+
+  <section class="home-section">
+    <div class="section-head"><h2>Hiring trends (30 days)</h2></div>
+    {% if trends_note %}<div class="empty">{{ trends_note }}</div>{% else %}
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Domain</th><th>Last 30 days</th><th>Previous 30 days</th><th>Change</th></tr></thead>
+        <tbody>
+          {% for t in trends %}
+          <tr><td>{{ t.icon }} {{ t.name }}</td><td>{{ t.recent }}</td><td>{{ t.previous }}</td><td>{{ t.label }}</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% endif %}
+    <p class="muted small">Trends are shown only when 8+ jobs span two 30-day windows — we never invent market movement.</p>
+  </section>
+</div>
+{% endblock %}

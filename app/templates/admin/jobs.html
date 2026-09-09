@@ -1,0 +1,63 @@
+{% extends "admin/base.html" %}
+{% block title %}Jobs — Skillected Admin{% endblock %}
+{% block admin_content %}
+<h1 style="margin-top:0">Job Review Queue</h1>
+<form class="filters-bar" method="get" action="/admin/jobs">
+  <input type="text" name="q" value="{{ f_q }}" placeholder="Title or company">
+  <select name="status">
+    <option value="">All statuses</option>
+    {% for s in statuses %}<option value="{{ s }}" {{ 'selected' if f_status == s }}>{{ s }}</option>{% endfor %}
+  </select>
+  <select name="verification">
+    <option value="">All verification</option>
+    {% for v in verifications %}<option value="{{ v }}" {{ 'selected' if f_verification == v }}>{{ v }}</option>{% endfor %}
+  </select>
+  <button class="btn btn-primary btn-sm">Filter</button>
+</form>
+
+<form method="post" action="/admin/jobs/bulk">
+  <input type="hidden" name="_csrf" value="{{ session.csrf_token }}">
+  <div class="filters-bar">
+    <select name="action">
+      <option value="approve">Approve selected</option>
+      <option value="reject">Reject selected</option>
+      <option value="expire">Expire selected</option>
+    </select>
+    <button class="btn btn-outline btn-sm" type="submit">Apply to selected</button>
+    <span class="muted small">{{ total }} job(s)</span>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr>
+        <th></th><th>Job</th><th>Company</th><th>City</th><th>Freshness</th><th>Score</th><th>Status</th><th>Verification</th><th>Actions</th>
+      </tr></thead>
+      <tbody>
+      {% for j in jobs %}
+        <tr>
+          <td><input type="checkbox" name="selected" value="{{ j.job_id }}"></td>
+          <td><a href="/jobs/{{ j.slug }}-{{ j.job_id }}">{{ j.job_title }}</a>{% if j.is_demo %} <span class="demo-badge">DEMO</span>{% endif %}</td>
+          <td>{{ j.company_name }}</td>
+          <td>{{ j.city }}</td>
+          <td><span class="freshness-badge {{ j.freshness_css }}" style="position:static">{{ j.freshness_label }}</span></td>
+          <td>{{ j.authenticity_score or '—' }}</td>
+          <td>{{ j.job_status }}</td>
+          <td>{{ j.verification_status }}</td>
+          <td class="actions-cell">
+            <button class="btn btn-outline btn-sm" formaction="/admin/jobs/{{ j.job_id }}/approve" formmethod="post" name="_csrf" value="{{ session.csrf_token }}">✓ Approve</button>
+            <button class="btn btn-warn btn-sm" formaction="/admin/jobs/{{ j.job_id }}/reject" formmethod="post" name="_csrf" value="{{ session.csrf_token }}">✗ Reject</button>
+            <button class="btn btn-danger btn-sm" formaction="/admin/jobs/{{ j.job_id }}/expire" formmethod="post" name="_csrf" value="{{ session.csrf_token }}">⏱ Expire</button>
+          </td>
+        </tr>
+      {% endfor %}
+      {% if not jobs %}<tr><td colspan="9" class="muted">No jobs match.</td></tr>{% endif %}
+      </tbody>
+    </table>
+  </div>
+</form>
+
+<div class="pagination">
+  {% if page > 1 %}<a href="/admin/jobs?page={{ page - 1 }}">← Prev</a>{% endif %}
+  {% if page < pages %}<a href="/admin/jobs?page={{ page + 1 }}">Next →</a>{% endif %}
+</div>
+{% endblock %}

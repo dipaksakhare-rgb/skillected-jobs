@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% from "_macros.html" import job_card %}
+{% block title %}{{ title }} | Skillected Jobs{% endblock %}
+{% block content %}
+<div class="container page-head">
+  <h1>{{ title }}</h1>
+  <p class="muted">{{ total }} verified opening{{ 's' if total != 1 }} · direct company applications.</p>
+</div>
+<div class="container">
+  {% if jobs %}
+    <div class="job-grid">{% for job in jobs %}{{ job_card(job) }}{% endfor %}</div>
+  {% else %}
+    <div class="empty">No jobs in this collection right now.</div>
+  {% endif %}
+</div>
+{% endblock %}

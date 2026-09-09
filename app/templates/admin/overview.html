@@ -1,0 +1,59 @@
+{% extends "admin/base.html" %}
+{% block title %}Overview — Skillected Admin{% endblock %}
+{% block admin_content %}
+<h1 style="margin-top:0">Placement Intelligence Dashboard</h1>
+<p class="muted">What is happening in the IT job market — real data only (demo rows excluded).</p>
+
+<div class="metric-grid">
+  <div class="stat-card"><div class="num">{{ metrics.total_jobs }}</div><div class="lbl">Active verified jobs</div></div>
+  <div class="stat-card"><div class="num">{{ stats.jobs_last_24h }}</div><div class="lbl">New jobs (24h)</div></div>
+  <div class="stat-card"><div class="num">{{ stats.jobs_last_12h }}</div><div class="lbl">Last 12 hours</div></div>
+  <div class="stat-card"><div class="num">{{ stats.fresher_jobs }}</div><div class="lbl">Fresher jobs</div></div>
+  <div class="stat-card"><div class="num">{{ metrics.companies }}</div><div class="lbl">Companies tracked</div></div>
+  <div class="stat-card"><div class="num">{{ metrics.apply_clicks }}</div><div class="lbl">Application clicks</div></div>
+  <div class="stat-card"><div class="num">{{ metrics.verified }}</div><div class="lbl">Verified</div></div>
+  <div class="stat-card"><div class="num">{{ metrics.needs_review }}</div><div class="lbl">Needs review</div></div>
+  <div class="stat-card"><div class="num">{{ metrics.expired }}</div><div class="lbl">Expired</div></div>
+</div>
+
+<div class="panel" style="margin-bottom:16px">
+  <h2>📡 Placement Radar (today)</h2>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Domain</th><th>New jobs</th><th>Fresher</th><th>Experienced</th><th>Total</th></tr></thead>
+      <tbody>
+        {% for r in radar_rows %}
+        <tr><td>{{ r.icon }} {{ r.name }}</td><td>{{ r.new_jobs or 0 }}</td><td>{{ r.fresher or 0 }}</td><td>{{ r.experienced or 0 }}</td><td class="radar-total">{{ r.total }}</td></tr>
+        {% endfor %}
+        {% if not radar_rows %}<tr><td colspan="5" class="muted">No verified jobs yet.</td></tr>{% endif %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div style="display:grid; gap:16px; grid-template-columns:repeat(auto-fit,minmax(300px,1fr))">
+  <div class="panel">
+    <h2>🔌 Source health</h2>
+    <table>
+      <tbody>
+      {% for s in source_health %}
+        <tr><td>{{ s.company }}</td><td><span class="{{ s.css }}">{{ s.status_label }}</span></td><td class="muted small">{{ s.last_checked or 'never' }}</td></tr>
+      {% endfor %}
+      {% if not source_health %}<tr><td class="muted">No sources registered yet.</td></tr>{% endif %}
+      </tbody>
+    </table>
+    <a class="btn btn-ghost btn-sm" href="/admin/sources">Manage sources →</a>
+  </div>
+  <div class="panel">
+    <h2>⚡ Recent events</h2>
+    <table>
+      <tbody>
+      {% for e in events %}
+        <tr><td>{{ e.event_type }}</td><td class="muted small">{{ e.created_at }}</td></tr>
+      {% endfor %}
+      {% if not events %}<tr><td class="muted">No events yet.</td></tr>{% endif %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,29 @@
+# --- runtime data & secrets (never commit) ---
+data/
+.env
+*.db
+*.db-shm
+*.db-wal
+
+# --- logs ---
+.freebuff/*.log
+.freebuff/*.log.err
+.freebuff/crawl*.log
+*.log
+
+# --- python ---
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+.venv/
+venv/
+
+# --- editor ---
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# --- generated poster/QR artifacts, if ever written to disk ---
+data/posters/

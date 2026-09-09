@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% from "_macros.html" import job_card %}
+{% block title %}{{ company.name }} Careers — Verified Openings | Skillected Jobs{% endblock %}
+
+{% block content %}
+<div class="container page-head">
+  <div class="card-top">
+    <div class="logo" style="width:56px;height:56px">
+      {% if company.logo_url %}<img src="{{ company.logo_url }}" alt="{{ company.name }}">
+      {% else %}<span class="logo-fallback">{{ company.name[:1] }}</span>{% endif %}
+    </div>
+    <div>
+      <h1 style="margin:0">{{ company.name }}{% if company.is_demo %} <span class="demo-badge">DEMO DATA</span>{% endif %}</h1>
+      <p class="muted" style="margin:4px 0 0">
+        {% if company.industry %}{{ company.industry }} · {% endif %}
+        {% if company.hq_location %}HQ {{ company.hq_location }} · {% endif %}
+        {% if company.company_size %}{{ company.company_size }} · {% endif %}
+        {% if company.verification_status == 'verified' %}<span class="verify-chip">✓ Verified company</span>{% endif %}
+      </p>
+    </div>
+  </div>
+</div>
+
+<div class="container detail-grid">
+  <div style="display:flex;flex-direction:column;gap:16px">
+    {% if company.description %}
+    <div class="panel"><h2>About</h2><p>{{ company.description }}</p></div>
+    {% endif %}
+    <div class="panel">
+      <h2>Recent openings</h2>
+      {% if recent_jobs %}
+        <div class="job-grid">{% for j in recent_jobs %}{{ job_card(j) }}{% endfor %}</div>
+      {% else %}
+        <p class="muted">No active openings from this company right now.</p>
+      {% endif %}
+    </div>
+  </div>
+  <aside style="display:flex;flex-direction:column;gap:16px">
+    <div class="panel">
+      <h2>Hiring snapshot</h2>
+      <dl class="kv">
+        <dt>Active jobs</dt><dd><strong>{{ counts.total }}</strong></dd>
+        <dt>Fresher</dt><dd>{{ counts.fresher }}</dd>
+        <dt>Experienced</dt><dd>{{ counts.experienced }}</dd>
+        <dt>Website</dt><dd>{{ company.official_url or 'Not specified' }}</dd>
+        <dt>Careers page</dt><dd>{{ company.careers_url or 'Not specified' }}</dd>
+      </dl>
+      <a class="btn btn-outline btn-sm" href="/jobs?company={{ company.name | urlencode }}">See all {{ company.name }} jobs</a>
+      {% if session %}
+        <form method="post" action="/companies/{{ company.company_id }}/follow" style="margin-top:8px">
+          <input type="hidden" name="_csrf" value="{{ session.csrf_token }}">
+          <button class="btn btn-primary btn-sm">⭐ Follow for new-job alerts</button>
+        </form>
+      {% else %}
+        <a class="btn btn-ghost btn-sm" href="/login?next=/companies/{{ company.slug }}" style="margin-top:8px">Sign in to follow</a>
+      {% endif %}
+    </div>
+    {% if top_skills %}
+    <div class="panel">
+      <h2>Most requested skills</h2>
+      <div class="job-skills">
+        {% for s in top_skills %}<span class="skill-chip">{{ s.canonical }} ({{ s.n }})</span>{% endfor %}
+      </div>
+    </div>
+    {% endif %}
+  </aside>
+</div>
+{% endblock %}

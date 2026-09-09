@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Demo job — application not available | Skillected Jobs{% endblock %}
+{% block content %}
+<div class="container page-head">
+  <h1>⚠️ This is a demo listing</h1>
+</div>
+<div class="container">
+  <div class="panel" style="max-width:640px">
+    <p><strong>“{{ job.job_title }}” at {{ job.company_name }} is seeded demonstration data.</strong></p>
+    <p class="muted">Skillected Jobs never presents demo jobs as real opportunities and never redirects demo listings to employer websites. In production, this button redirects to the company's verified official application page.</p>
+    <a class="btn btn-primary" href="/jobs/{{ job.slug }}-{{ job.job_id }}">← Back to the demo listing</a>
+    <a class="btn btn-ghost" href="/jobs">Browse real published jobs</a>
+  </div>
+</div>
+{% endblock %}

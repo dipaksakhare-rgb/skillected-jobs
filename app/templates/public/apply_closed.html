@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Application closed | Skillected Jobs{% endblock %}
+{% block content %}
+<div class="container page-head">
+  <h1>🔴 Application closed</h1>
+</div>
+<div class="container">
+  <div class="panel" style="max-width:640px">
+    <p><strong>{{ job.job_title }} at {{ job.company_name }}</strong> is no longer accepting applications through this link.</p>
+    <p class="muted">The listing was marked expired during verification (404, requisition removed or application disabled). Historical data is retained for market intelligence.</p>
+    <a class="btn btn-primary" href="/jobs">Browse current openings</a>
+  </div>
+</div>
+{% endblock %}

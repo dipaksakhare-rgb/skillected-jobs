@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}🎓 Curriculum Intelligence — Skillected Jobs{% endblock %}
+{% block meta_description %}Which skills should training emphasize? Market-requested skills per IT domain, mapped to Skillected programs — from real verified listings.{% endblock %}
+{% block content %}
+<div class="container page-head">
+  <h1>🎓 Curriculum Intelligence</h1>
+  <p class="muted">Market → Skills → Course → Jobs (§72). Skills are aggregated from verified job listings; courses link to the official Skillected catalog.</p>
+</div>
+<div class="container" style="padding-bottom:24px">
+  {% if not blocks %}
+    <div class="empty">Insights appear once verified jobs are published across domains.</div>
+  {% endif %}
+  {% for b in blocks %}
+  <div class="panel" style="margin-bottom:16px">
+    <h2 style="margin-top:0">{{ b.domain_name }} <span class="muted small">· {{ b.jobs }} verified job{{ 's' if b.jobs != 1 }}</span></h2>
+    <div class="detail-grid" style="padding:0; gap:12px">
+      <div>
+        <h3 class="small" style="margin:0 0 6px">Top market-requested skills</h3>
+        <div class="job-skills">
+          {% for s in b.top_skills %}<span class="skill-chip">{{ s.canonical }} · {{ s.demand }}</span>{% endfor %}
+          {% if not b.top_skills %}<span class="muted small">No skill data yet.</span>{% endif %}
+        </div>
+      </div>
+      <div>
+        <h3 class="small" style="margin:0 0 6px">Skillected programs for this domain</h3>
+        {% if b.courses %}
+          <ul style="margin:0;padding-left:18px">
+            {% for c in b.courses %}<li><a href="https://www.skillected.com/" target="_blank" rel="noopener">{{ c.title }}</a></li>{% endfor %}
+          </ul>
+        {% else %}<span class="muted small">No mapped program — see <a href="https://www.skillected.com/">skillected.com</a>.</span>{% endif %}
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+  <p class="muted small">For training teams: if a domain's top skills shift, update the curriculum emphasis (§71). This page reads only from verified platform data.</p>
+</div>
+{% endblock %}

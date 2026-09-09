@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Job Poster — {{ job.job_title }} | Skillected Jobs{% endblock %}
+{% block content %}
+<div class="container page-head">
+  <h1>🖼 Job Poster</h1>
+  <p class="muted">1080 × 1350 — share on WhatsApp status, Instagram or print. Regeneration and image export arrive with Phase 3 automation.</p>
+</div>
+<div class="container">
+  <div class="poster">
+    <div class="p-brand"><span>SKILLECTED JOBS</span><span>NEW JOB OPPORTUNITY</span></div>
+    <div class="p-kicker">VERIFIED COMPANY OPENING{% if job.is_demo %} · DEMO DATA{% endif %}</div>
+    <div class="p-company">{{ job.company_name }}</div>
+    <div class="p-title">{{ job.job_title }}</div>
+    <div class="p-meta">
+      <span>📍 {{ job.city or 'Pune' }}</span>
+      <span>👨‍💻 {{ job.experience_text }}</span>
+      {% if job.salary_display %}<span>💰 {{ job.salary_display }}</span>{% endif %}
+      {% if job.work_mode %}<span>{{ {'onsite':'On-site','hybrid':'Hybrid','remote':'Remote'}[job.work_mode] }}</span>{% endif %}
+      <span>{{ job.freshness_label }}</span>
+    </div>
+    {% if job.skills_list %}<div class="p-skills">{{ job.skills_list[:6] | join(' • ') }}</div>{% endif %}
+    <div class="p-cta">
+      <div class="p-qr"><img src="{{ qr_url }}" alt="QR code to apply" style="width:100%;display:block"></div>
+      <div>
+        <div class="p-apply-text">DIRECT APPLICATION</div>
+        <div class="p-scan">SCAN TO APPLY</div>
+      </div>
+    </div>
+    <div class="p-footer">Verified IT Opportunities for Students &amp; Professionals</div>
+  </div>
+  <div class="share-row" style="margin:18px auto; max-width:640px">
+    <a class="btn btn-outline" href="/jobs/{{ job.slug }}-{{ job.job_id }}">← Back to job</a>
+    <a class="btn btn-ghost" href="/jobs/{{ job.job_id }}/whatsapp">📲 WhatsApp message</a>
+  </div>
+</div>
+{% endblock %}

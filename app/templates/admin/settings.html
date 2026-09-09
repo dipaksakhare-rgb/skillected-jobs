@@ -1,0 +1,36 @@
+{% extends "admin/base.html" %}
+{% block title %}Settings — Skillected Admin{% endblock %}
+{% block admin_content %}
+<h1 style="margin-top:0">Automation Settings</h1>
+<form class="panel" style="max-width:640px" method="post" action="/admin/settings">
+  <input type="hidden" name="_csrf" value="{{ session.csrf_token }}">
+  <div class="field">
+    <label for="auto_publish_threshold">Auto-publish threshold (verification score ≥)</label>
+    <input id="auto_publish_threshold" type="number" name="auto_publish_threshold" min="0" max="100" value="{{ current.auto_publish_threshold or '85' }}">
+    <p class="muted small">Jobs scoring at or above this are auto-published; below goes to manual review; below the review threshold is rejected (§54).</p>
+  </div>
+  <div class="field">
+    <label for="manual_review_threshold">Manual-review floor</label>
+    <input id="manual_review_threshold" type="number" name="manual_review_threshold" min="0" max="100" value="{{ current.manual_review_threshold or '70' }}">
+  </div>
+  <div class="field">
+    <label for="crawl_frequency_minutes">Default crawl frequency</label>
+    <select id="crawl_frequency_minutes" name="crawl_frequency_minutes">
+      {% for f, label in [(15,'15 minutes'),(30,'30 minutes'),(60,'1 hour'),(360,'6 hours'),(720,'12 hours'),(1440,'24 hours')] %}
+      <option value="{{ f }}" {{ 'selected' if current.crawl_frequency_minutes == f|string }}>{{ label }}</option>
+      {% endfor %}
+    </select>
+    <p class="muted small">Default for new sources; per-source frequencies are set on the Sources page (§89: never hard-coded).</p>
+  </div>
+  {% for key, label in [('poster_generation','Poster generation'),('whatsapp_generation','WhatsApp message generation'),('candidate_notifications','Candidate notifications'),('resume_matching','Resume matching'),('job_alerts','Job alerts')] %}
+  <div class="field">
+    <label for="{{ key }}">{{ label }}</label>
+    <select id="{{ key }}" name="{{ key }}">
+      <option value="on" {{ 'selected' if current.get(key) == 'on' }}>On</option>
+      <option value="off" {{ 'selected' if current.get(key) == 'off' }}>Off</option>
+    </select>
+  </div>
+  {% endfor %}
+  <button class="btn btn-primary" type="submit">Save settings</button>
+</form>
+{% endblock %}
