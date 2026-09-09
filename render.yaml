@@ -1,10 +1,15 @@
 # Render.com blueprint — one-click deploy for Skillected Jobs.
 # Deploy: push to GitHub → Render Dashboard → New → Blueprint → select repo.
+# NOTE: runs on the FREE tier (no credit card needed). Free instances have no
+# persistent disks, so the SQLite DB lives on ephemeral storage: every redeploy
+# or restart rebuilds it from migrations and re-crawls all sources (accounts/
+# resumes do not survive a redeploy). Upgrade to the $7/mo Starter plan + disk
+# for always-on, persistent storage (see docs/09-DEPLOYMENT.md).
 services:
   - type: web
     name: skillected-jobs
     runtime: python
-    plan: starter          # free tier works too (see docs/09-DEPLOYMENT.md)
+    plan: free
     buildCommand: pip install -r requirements.txt
     startCommand: python scripts/start_prod.py
     healthCheckPath: /healthz
@@ -23,10 +28,3 @@ services:
         value: "1"
       - key: INITIAL_CRAWL
         value: "1"
-      # Persistent disk keeps the SQLite DB + stored resumes across deploys.
-      - key: DATABASE_URL
-        value: sqlite:////var/data/skillected.db
-    disk:
-      name: skillected-data
-      mountPath: /var/data
-      sizeGB: 1
