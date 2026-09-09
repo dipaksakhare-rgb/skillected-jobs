@@ -14,6 +14,8 @@ services:
     startCommand: python scripts/start_prod.py
     healthCheckPath: /healthz
     envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.9
       - key: APP_ENV
         value: production
       - key: APP_BASE_URL
