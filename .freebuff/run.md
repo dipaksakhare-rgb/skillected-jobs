@@ -1,5 +1,12 @@
 # Run doc — Skillected Jobs (Python FastAPI)
 
+## Production deployment (LIVE)
+
+URL: **https://skillected-jobs.onrender.com** (Render free tier, blueprint from
+`render.yaml`, auto-deploys on every push to main). Admin: `/admin` with the
+`ADMIN_EMAIL`/`ADMIN_PASSWORD` set in Render's dashboard. Free tier: sleeps after
+~15 min idle; DB is ephemeral and rebuilt by the bootstrap on each deploy.
+
 ## Reproduce artifacts (fresh checkout)
 
 ```bash
